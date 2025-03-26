@@ -51,8 +51,8 @@ class plotLVIS(lvisGround):
     return
 
 
-def norm_long(lon):
-    return (lon) % 360 
+# def norm_long(lon):
+#     return (lon) % 360 
 ##########################################
 
 
@@ -70,18 +70,19 @@ b=plotLVIS(filename,onlyBounds=True)
 
 # set a steo size (note that this will be in degrees)
 
-x0 = norm_long(-102.00)
-#print(x0)
-y0 = -75.4
-x1 = norm_long(-99.00)
-#print(x1)
-y1 = -74.6
+# x0 = norm_long(-102.00)
+# #print(x0)
+# y0 = -75.4
+# x1 = norm_long(-99.00)
+# #print(x1)
+# y1 = -74.6
 
-# x0=b.bounds[0]
-# y0=b.bounds[1]
-# x1=(b.bounds[2]-b.bounds[0])/1+b.bounds[0]
-# y1=(b.bounds[3]-b.bounds[1])/1+b.bounds[1]
-# print(f"Bounding extent: {b.bounds}")
+x0=b.bounds[0]
+y0=b.bounds[1]
+x1=(b.bounds[2]-b.bounds[0])/1+b.bounds[0]
+y1=(b.bounds[3]-b.bounds[1])/1
++b.bounds[1]
+print(f"Bounding extent: {b.bounds}")
 #read in all data within our spatial subset
 lvis=plotLVIS(filename,minX=x0,minY=y0,maxX=x1,maxY=y1,setElev=True)
 
