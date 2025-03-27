@@ -16,8 +16,6 @@ plt.imshow(raster, cmap='BrBG')
 mask_boolean = (raster !=-999)
 print(mask_boolean)
 
-# mask_numbers = np.zeros_like(raster)
-# mask_numbers[raster > 0] = 255
 
 # print(mask_numbers)
 

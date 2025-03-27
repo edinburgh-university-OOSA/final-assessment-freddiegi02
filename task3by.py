@@ -1,37 +1,19 @@
 import rasterio
 from rasterio.merge import merge
-#from rasterio.plot import show
-import glob
-import os
+from glob import glob
 from matplotlib import pyplot as plt
-import numpy as np
 
-
-dirpath = "/home/s2758252/OOSE/Summative/"
+dirpath = glob("/home/s2758252/OOSE/Summative/*tif")
 out_fp = "/home/s2758252/OOSE/Summative/OutputRaster/Merged2015.tif"
 
-search_criteria = "lvisDEM2015*.tif"
+mosacic_files = []
 
-q = os.path.join(dirpath, search_criteria)
-print(q)
-
-dem_fps = glob.glob(q)
-
-print(dem_fps)
-
-src_files_to_mosaic = []
-
-for fp in dem_fps:
-    src = rasterio.open(fp)
-    src_files_to_mosaic.append(src)
+for files in dirpath:
+    src = rasterio.open(files)
+    mosacic_files.append(src)
 
 
-print(src_files_to_mosaic)
-
-mosaic, out_trans = merge(src_files_to_mosaic)
-
-plt.imshow(mosaic[0], cmap='terrain')
-#SSplt.show()
+mosaic, out_trans = merge(mosacic_files)
 
 out_meta = src.meta.copy()
 
@@ -42,7 +24,6 @@ out_meta.update({
     "transform": out_trans,
     "count": mosaic.shape[0],
     "dtype": mosaic.dtype,
-        # Ensure correct data typea
 })
 
 with rasterio.open(out_fp, "w", **out_meta) as dest:

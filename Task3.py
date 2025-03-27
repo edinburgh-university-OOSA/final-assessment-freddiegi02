@@ -13,9 +13,8 @@ import argparse #Import for handling command-line arguments
 import numpy as np #Import for numerical operations 
 import os #Import for file and directory handling
 from rasterio.merge import merge #Import for merging GeoTIFF files
-import rasterio
-from rasterio.merge import merge
-f
+import rasterio #Import to help with Raster Data
+from glob import glob #Import to help with multiple files and folders 
 
 #from Task2 import reprojectLVIS
 
@@ -56,9 +55,42 @@ class plotLVIS(lvisGround):
     # call function from tiffExample.py
     writeTiff(self.zG,self.long,self.lat,res,filename=outName,epsg=3031)
     return
+    
+
+  def mergeDEM(self):
+    
+    # Get the current working directory (PWD)
+    current_dir = os.getcwd()
+
+    # Use the current working directory for the input files and output file
+    dirpath = glob(f"{current_dir}/*tif")
+    out_fp = f"{current_dir}/Merged2009.tif"
+
+    mosacic_files = []
+
+    for files in dirpath:
+        src = rasterio.open(files)
+        mosacic_files.append(src)
+
+    mosaic, out_trans = merge(mosacic_files)
+
+    out_meta = src.meta.copy()
+
+    out_meta.update({
+        "driver": "GTiff",
+        "height": mosaic.shape[1],
+        "width": mosaic.shape[2],
+        "transform": out_trans,
+        "count": mosaic.shape[0],
+        "dtype": mosaic.dtype,
+    })
+
+    with rasterio.open(out_fp, "w", **out_meta) as dest:
+        dest.write(mosaic)
+
 
 #Normalise longitude to ensure it stays within a valid range (0-360 degrees)
-def norm_long(lon):
+def norm_lon(lon):
     return (lon) % 360 
 
 ##########################################
@@ -67,7 +99,7 @@ def norm_long(lon):
 if __name__=="__main__":
   '''Main block'''
 
-# #read the command line arguments 
+# read the command line arguments 
 args = getCmdArgs()
 folder = args.folder #Folder where LVIS data is stored
 res = args.res # Res for DEM file
@@ -84,10 +116,11 @@ for filename in os.listdir(folder):
         print(f"File Processed {filepath}") #Print files being processed
 
 
-        x0 = norm_long(-102.00) # Min Long
-        y0 = -75.4 # Min Lat
-        x1 = norm_long(-99.00) #Max Long
-        y1 = -70.6 # Max Lat
+        x0 = norm_lon(-102.00) # set min x coord
+        y0 = -75.4 # set min y coord
+        x1 = norm_lon(-99.00) #set max x coord
+        y1 = -74.6 #set max y coord
+
 
         #Read in the data
         lvis=plotLVIS(filepath,minX=x0,minY=y0,maxX=x1,maxY=y1,setElev=True)
@@ -102,3 +135,6 @@ for filename in os.listdir(folder):
     except AttributeError as e:
         #Print error in file
         print(f"{filepath} Skipped")
+
+
+lvis.mergeDEM()
