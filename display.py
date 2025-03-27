@@ -2,7 +2,7 @@ import rasterio
 import matplotlib.pyplot as plt
 
 # Open the raster file
-filename = 'OutputRaster/MergedFILL.tif'  # Replace with your raster file path
+filename = 'lvisDEMLat.tif'  # Replace with your raster file path
 with rasterio.open(filename) as src:
     # Read the data (this reads all bands by default)
     band1 = src.read(1)  # Read the first band (e.g., grayscale)

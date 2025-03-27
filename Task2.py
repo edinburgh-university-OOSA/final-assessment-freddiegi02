@@ -1,31 +1,28 @@
 
 '''
-An example of how to use the 
-LVIS python scripts
+Plotting a singular plot
 '''
 
-# import the HDF5 data handler class
 
-from processLVIS import lvisGround
-
-#from lvisCla import lvisData
-from pyproj import Proj, transform
-from matplotlib import pyplot as plt
-import numpy as np
-from tiffExample import writeTiff
-import argparse
+from tiffExample import writeTiff # Import function to write GeoTIFF files
+from processLVIS import lvisGround #Importing lvisGround class from processLVIS
+from pyproj import Proj, transform #Importing Proj and transform to change the CRS
+from matplotlib import pyplot as plt #Import for plotting
+import numpy as np #Import for numerical operations 
+import argparse #Import for handling command-line arguments 
 
 
 def getCmdArgs():
-  # function description for use within python
   '''
   Get commandline arguments
   '''
-  # create an argparse object with a useful help comment
+  # Create an argparse paser object with a description
   ap = argparse.ArgumentParser(description=("An illustration of a command line parser"))
-  # read a string
+  # Add a positional argument for the input filename (string)
   ap.add_argument("filename",type=str,help=("Input filename"))
+  # Add a positional argument for the resolution (integer)
   ap.add_argument("res", type=int,help=("Spec Res"))
+  # Parse command-line arguments
   args = ap.parse_args()
   # return that object from this function
   return args
@@ -33,8 +30,10 @@ def getCmdArgs():
 ##########################################S
 
 class plotLVIS(lvisGround):
-  '''A class, ineriting from lvisData
-     and add a plotting method'''
+  """
+  A class inheriting from lvisGround and adding additional methods 
+  for reprojecting geolocation data and writing DEM files.
+  """
 
   def reprojectLVIS(self, outEPSG):
     '''A method to reproject the geolocation data'''
@@ -49,52 +48,31 @@ class plotLVIS(lvisGround):
     # call function from tiffExample.py
     writeTiff(self.zG,self.long,self.lat,res,filename=outName,epsg=3031)
     return
-
-
-# def norm_long(lon):
-#     return (lon) % 360 
-##########################################
-
+  
+def norm_lon(lon):
+    #Normalise longitude to ensure values remain within a valid range (0-360 degrees)
+    return (lon) % 360
 
 if __name__=="__main__":
   '''Main block'''
 
 # read the command line
 args = getCmdArgs()
-filename = args.filename
-res = args.res
-
-  # create instance of class with "onlyBounds" flag
-b=plotLVIS(filename,onlyBounds=True)
+filename = args.filename #Store input filename
+res = args.res #Store spatial resolution
 
 
-# set a steo size (note that this will be in degrees)
+x0 = norm_lon(-102.00) # set min x coord
+y0 = -75.4 # set min y coord
+x1 = norm_lon(-99.00) #set max x coord
+y1 = -74.6 #set max y coord
 
-# x0 = norm_long(-102.00)
-# #print(x0)
-# y0 = -75.4
-# x1 = norm_long(-99.00)
-# #print(x1)
-# y1 = -74.6
-
-x0=b.bounds[0]
-y0=b.bounds[1]
-x1=(b.bounds[2]-b.bounds[0])/1+b.bounds[0]
-y1=(b.bounds[3]-b.bounds[1])/1
-+b.bounds[1]
-print(f"Bounding extent: {b.bounds}")
 #read in all data within our spatial subset
 lvis=plotLVIS(filename,minX=x0,minY=y0,maxX=x1,maxY=y1,setElev=True)
 
-#print(res)
 
-# plot up some waveforms using your new method
-#lvis.plotWave(0)
-# to make a DEM as a geotiff
-
-lvis.reprojectLVIS(3031) # reproject the data to local UTM zone
-lvis.estimateGround()    # find ground elevations
-outName="lvisDEMLat.tif"  # set output filename
-lvis.writeDEM(res, outName)           
-#               #write data to a DEM at 100 m resolution
+lvis.reprojectLVIS(3031) # Reproject the data to the Antarctic Polar Stereographic projection (EPSG 3031)
+lvis.estimateGround()    # Estimate ground elevation from LVIS data
+outName="DEM.tif" # Set the output filename for the DEM
+lvis.writeDEM(res, outName) # Write the DEM data to a GeoTIFF file with the specified resolution
 
