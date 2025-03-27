@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-raster_file = rasterio.open('/home/s2758252/OOSE/Summative/OutputRaster/Merged2015.tif')
-out_fp = "/home/s2758252/OOSE/Summative/OutputRaster/MergedFILL2015.tif"
+raster_file = rasterio.open('/home/s2758252/OOSE/Summative/final-assessment-freddiegi02/Merged2009.tif')
+out_fp = "/home/s2758252/OOSE/Summative/final-assessment-freddiegi02/Merged2009FILL.tif"
 
 raster = raster_file.read(1)
 print(raster)
@@ -19,7 +19,7 @@ print(mask_boolean)
 
 # print(mask_numbers)
 
-filled_raster = fillnodata(raster, mask = mask_boolean, max_search_distance = 1)
+filled_raster = fillnodata(raster, mask = mask_boolean, max_search_distance = 100)
 
 plt.imshow(raster, cmap='BrBG')
 plt.colorbar(label="Elevation") 
