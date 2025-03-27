@@ -12,6 +12,7 @@ import numpy as np #Import for numerical operations
 import argparse #Import for handling command-line arguments 
 
 
+
 def getCmdArgs():
   '''
   Get commandline arguments
