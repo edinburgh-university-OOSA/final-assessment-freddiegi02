@@ -3,7 +3,7 @@
 Plotting a singular plot
 '''
 
-import tracemalloc
+
 from tiffExample import writeTiff # Import function to write GeoTIFF files
 from processLVIS import lvisGround #Importing lvisGround class from processLVIS
 from pyproj import Proj, transform #Importing Proj and transform to change the CRS
@@ -13,7 +13,6 @@ import argparse #Import for handling command-line arguments
 
 
 
-tracemalloc.start()
 def getCmdArgs():
   '''
   Get commandline arguments
@@ -58,41 +57,22 @@ def norm_lon(lon):
 if __name__=="__main__":
   '''Main block'''
 
-  # read the command line
-  args = getCmdArgs()
-  filename = args.filename #Store input filename
-  res = args.res #Store spatial resolution
+# read the command line
+args = getCmdArgs()
+filename = args.filename #Store input filename
+res = args.res #Store spatial resolution
 
 
-  x0 = norm_lon(-102.00) # set min x coord
-  y0 = -75.4 # set min y coord
-  x1 = norm_lon(-99.00) #set max x coord
-  y1 = -74.6 #set max y coord
+x0 = norm_lon(-102.00) # set min x coord
+y0 = -75.4 # set min y coord
+x1 = norm_lon(-99.00) #set max x coord
+y1 = -74.6 #set max y coord
 
-  file_count = 1
-
-  step_x = (x1 - x0) / 4 # Divide the x-range into 6 tiles
-  step_y = (y1 - y0) / 4  # Divide the y-range into 6 tiles
-
-  for tile_x0 in np.arange(x0,x1, step_x):
-    tile_x1=tile_x0+step_x
-    for tile_y0 in np.arange(y0, y1, step_y):
-      tile_y1=tile_y0+step_y
-      
-      try:
-          #read in all data within our spatial subset
-        lvis=plotLVIS(filename,minX=tile_x0,minY=tile_y0,maxX=tile_x1,maxY=tile_y1,setElev=True)
+#read in all data within our spatial subset
+lvis=plotLVIS(filename,minX=x0,minY=y0,maxX=x1,maxY=y1,setElev=True)
 
 
-        lvis.reprojectLVIS(3031) # Reproject the data to the Antarctic Polar Stereographic projection (EPSG 3031)
-        lvis.estimateGround()  
-        outName = f"lvisDEM2009{file_count}.tif"  # Estimate ground elevation from LVIS data
-        file_count +=1 #Increase the file size by one each time
-        lvis.writeDEM(res, outName) # Write the DEM data to a GeoTIFF file with the specified resolution
-      
-      except AttributeError as e:
-        print(f"{filename} Skipped")
-  
-
-print("Memory peak usage:", tracemalloc.get_traced_memory())
-tracemalloc.stop()
+lvis.reprojectLVIS(3031) # Reproject the data to the Antarctic Polar Stereographic projection (EPSG 3031)
+lvis.estimateGround()    # Estimate ground elevation from LVIS data
+outName="DEM.tif" # Set the output filename for the DEM
+lvis.writeDEM(res, outName) # Write the DEM data to a GeoTIFF file with the specified resolution

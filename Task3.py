@@ -16,9 +16,9 @@ from rasterio.merge import merge #Import for merging GeoTIFF files
 import rasterio #Import to help with Raster Data
 from glob import glob #Import to help with multiple files and folders 
 
+#from Task2 import reprojectLVIS
 
 tracemalloc.start()
-#from Task2 import reprojectLVIS
 
 def getCmdArgs():
   '''
@@ -122,30 +122,27 @@ for filename in os.listdir(folder):
         y0 = -75.4 # set min y coord
         x1 = norm_lon(-99.00) #set max x coord
         y1 = -74.6 #set max y coord
-        
-        b=plotLVIS(filename,onlyBounds=True)
+
+        b=plotLVIS(filepath,onlyBounds=True)
         step=(b.bounds[2]-b.bounds[0]/6)
 
         for x0 in np.arange(b.bounds[0],b.bounds[2],step):  # loop over x tiles
           x1=x0+step   # the right side of the tile
           for y0 in np.arange(b.bounds[1],b.bounds[3],step):  # loop over y tiles
-            y1=y0+step  # the top of the tile
+            y1=y0+step
 
-      # print the bounds to screen as a sanity check
-        print("Tile between",x0,y0,"to",x1,y1)
-
+        
 
 
+            #Read in the data
+            lvis=plotLVIS(filepath,minX=x0,minY=y0,maxX=x1,maxY=y1,setElev=True)
 
-        #Read in the data
-        lvis=plotLVIS(filepath,minX=x0,minY=y0,maxX=x1,maxY=y1,setElev=True)
 
-
-        lvis.reprojectLVIS(3031) # reproject the data into Polar Sterographic
-        lvis.estimateGround()    # find ground elevations
-        outName = f"lvisDEM2015{file_count}.tif" # Set an ouputname
-        lvis.writeDEM(res, outName) #Write the DEm to a geoTIFF
-        file_count +=1 #Increase the file size by one each time
+            lvis.reprojectLVIS(3031) # reproject the data into Polar Sterographic
+            lvis.estimateGround()    # find ground elevations
+            outName = f"lvisDEM2015{file_count}.tif" # Set an ouputname
+            lvis.writeDEM(res, outName) #Write the DEm to a geoTIFF
+            file_count +=1 #Increase the file size by one each time
 
     except AttributeError as e:
         #Print error in file
@@ -156,4 +153,3 @@ lvis.mergeDEM()
 
 print("Memory peak usage:", tracemalloc.get_traced_memory())
 tracemalloc.stop()
-
