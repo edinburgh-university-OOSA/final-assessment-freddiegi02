@@ -3,7 +3,7 @@ A script to run multiple scripts and join them together
 This script processes LVIS data, creates Digital Elevation Models (DEMs) 
 and merges them into one output file.
 '''
-
+import tracemalloc
 from tiffExample import writeTiff # Import function to write GeoTIFF files
 from processLVIS import lvisGround #Importing lvisGround class from processLVIS
 from pyproj import Proj, transform #Importing Proj and transform to change the CRS
@@ -16,6 +16,8 @@ from rasterio.merge import merge #Import for merging GeoTIFF files
 import rasterio #Import to help with Raster Data
 from glob import glob #Import to help with multiple files and folders 
 
+
+tracemalloc.start()
 #from Task2 import reprojectLVIS
 
 def getCmdArgs():
@@ -120,6 +122,19 @@ for filename in os.listdir(folder):
         y0 = -75.4 # set min y coord
         x1 = norm_lon(-99.00) #set max x coord
         y1 = -74.6 #set max y coord
+        
+        b=plotLVIS(filename,onlyBounds=True)
+        step=(b.bounds[2]-b.bounds[0]/6)
+
+        for x0 in np.arange(b.bounds[0],b.bounds[2],step):  # loop over x tiles
+          x1=x0+step   # the right side of the tile
+          for y0 in np.arange(b.bounds[1],b.bounds[3],step):  # loop over y tiles
+            y1=y0+step  # the top of the tile
+
+      # print the bounds to screen as a sanity check
+        print("Tile between",x0,y0,"to",x1,y1)
+
+
 
 
         #Read in the data
@@ -138,3 +153,7 @@ for filename in os.listdir(folder):
 
 
 lvis.mergeDEM()
+
+print("Memory peak usage:", tracemalloc.get_traced_memory())
+tracemalloc.stop()
+
