@@ -10,7 +10,6 @@ from pyproj import Proj, transform #Importing Proj and transform to change the C
 from matplotlib import pyplot as plt #Import for plotting
 import numpy as np #Import for numerical operations 
 import argparse #Import for handling command-line arguments 
-import numpy as np #Import for numerical operations 
 import os #Import for file and directory handling
 from rasterio.merge import merge #Import for merging GeoTIFF files
 import rasterio #Import to help with Raster Data
@@ -65,8 +64,8 @@ class plotLVIS(lvisGround):
     current_dir = os.getcwd()
 
     # Use the current working directory for the input files and output file
-    dirpath = glob(f"{current_dir}/*tif")
-    out_fp = f"{current_dir}/Merged2009.tif"
+    dirpath = glob(f"{current_dir}T3/*tif")
+    out_fp = f"{current_dir}/Merged3.tif"
 
     mosacic_files = []
 
@@ -101,55 +100,64 @@ def norm_lon(lon):
 if __name__=="__main__":
   '''Main block'''
 
-# read the command line arguments 
-args = getCmdArgs()
-folder = args.folder #Folder where LVIS data is stored
-res = args.res # Res for DEM file
+  # read the command line arguments 
+  args = getCmdArgs()
+  folder = args.folder #Folder where LVIS data is stored
+  res = args.res # Res for DEM file
+
+  x0 = norm_lon(-102.00) # set min x coord
+  y0 = -75.4 # set min y coord
+  x1 = norm_lon(-99.00) #set max x coord
+  y1 = -74.6 #set max y coord
+
+  file_count = 1 #Initialise a counter
+
+  step_x = (x1 - x0) / 6 # Divide the x-range into 6 tiles
+  step_y = (y1 - y0) / 6  # Divide the y-range into 6 tiles
+
+  # Loop through each file in the folder
+  for filename in os.listdir(folder):
+    if filename.endswith(".h5"): #Process files that end with '.hf'
+      filepath = os.path.join(folder, filename) #Get the full file path
+
+      try: 
+          print(f"File Processed {filepath}") #Print files being processed
+
+          for tile_x0 in np.arange(x0,x1, step_x):
+            tile_x1=tile_x0+step_x
+            for tile_y0 in np.arange(y0, y1, step_y):
+              tile_y1=tile_y0+step_y
+              
+              try:
+                  #read in all data within our spatial subset
+                lvis=plotLVIS(filepath,minX=tile_x0,minY=tile_y0,maxX=tile_x1,maxY=tile_y1,setElev=True)
 
 
-file_count = 1 #Initialise a counter
+                lvis.reprojectLVIS(3031) # Reproject the data to the Antarctic Polar Stereographic projection (EPSG 3031)
+                lvis.estimateGround()  
+                outName = f"T3_DEM_{file_count}.tif"  # Estimate ground elevation from LVIS data
+                file_count +=1 #Increase the file size by one each time
+                lvis.writeDEM(res, outName) # Write the DEM data to a GeoTIFF file with the specified resolution
+              
+              except AttributeError as e:
+                print(f"{filepath} Skipped")
+          
 
-# Loop through each file in the folder
-for filename in os.listdir(folder):
-  if filename.endswith(".h5"): #Process files that end with '.hf'
-    filepath = os.path.join(folder, filename) #Get the full file path
-
-    try: 
-        print(f"File Processed {filepath}") #Print files being processed
-
-
-        x0 = norm_lon(-102.00) # set min x coord
-        y0 = -75.4 # set min y coord
-        x1 = norm_lon(-99.00) #set max x coord
-        y1 = -74.6 #set max y coord
-
-        b=plotLVIS(filepath,onlyBounds=True)
-        step=(b.bounds[2]-b.bounds[0]/6)
-
-        for x0 in np.arange(b.bounds[0],b.bounds[2],step):  # loop over x tiles
-          x1=x0+step   # the right side of the tile
-          for y0 in np.arange(b.bounds[1],b.bounds[3],step):  # loop over y tiles
-            y1=y0+step
-
-        
-
-
-            #Read in the data
-            lvis=plotLVIS(filepath,minX=x0,minY=y0,maxX=x1,maxY=y1,setElev=True)
-
-
-            lvis.reprojectLVIS(3031) # reproject the data into Polar Sterographic
-            lvis.estimateGround()    # find ground elevations
-            outName = f"lvisDEM2015{file_count}.tif" # Set an ouputname
-            lvis.writeDEM(res, outName) #Write the DEm to a geoTIFF
-            file_count +=1 #Increase the file size by one each time
-
-    except AttributeError as e:
-        #Print error in file
-        print(f"{filepath} Skipped")
+      except AttributeError as e:
+          #Print error in file
+          print(f"{filepath} Skipped")
 
 
 lvis.mergeDEM()
+current, peak = tracemalloc.get_traced_memory()
 
-print("Memory peak usage:", tracemalloc.get_traced_memory())
+# Convert bytes to MB
+current_mb = current / 10**9
+peak_mb = peak / 10**9
+
+# Print memory usage details
+print(f"Current memory usage: {current_mb:.2f} GB")
+print(f"Peak memory usage: {peak_mb:.2f} GB")
+
+# Stop tracing memory
 tracemalloc.stop()
