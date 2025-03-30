@@ -4,8 +4,8 @@ Plotting a singular plot
 '''
 
 import tracemalloc
-from tiffExample import writeTiff # Import function to write GeoTIFF files
-from processLVIS import lvisGround #Importing lvisGround class from processLVIS
+from src.tiffExample import writeTiff # Import function to write GeoTIFF files
+from src.processLVIS import lvisGround #Importing lvisGround class from processLVIS
 from pyproj import Proj, transform #Importing Proj and transform to change the CRS
 from matplotlib import pyplot as plt #Import for plotting
 import numpy as np #Import for numerical operations 

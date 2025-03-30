@@ -7,20 +7,22 @@ Some example functions for processing LVIS data
 
 import numpy as np
 from lvisClass import lvisData
-from pyproj import Proj, transform
 from scipy.ndimage.filters import gaussian_filter1d 
 
 
 #######################################
 
+
+
 class lvisGround(lvisData):
   '''
   LVIS class with extra processing steps
+  to allow it to found the ground over ice
   '''
 
   #######################################################
 
-  def estimateGround(self,threshScale=5,statsLen=10,minWidth=3,smooWidth=0.5):
+  def estimateGround(self,sigThresh=5,statsLen=10,minWidth=3,sWidth=0.5):
     '''
     Processes waveforms to estimate ground
     Only works for bare Earth. DO NOT USE IN TREES
@@ -29,10 +31,10 @@ class lvisGround(lvisData):
     self.findStats(statsLen=statsLen)
 
     # set threshold
-    threshold=self.setThreshold(threshScale)
+    threshold=self.setThreshold(sigThresh)
 
     # remove background
-    self.denoise(threshold,minWidth=minWidth,smooWidth=smooWidth)
+    self.denoise(threshold,minWidth=minWidth,sWidth=sWidth)
 
     # find centre of gravity of remaining signal
     self.CofG()
@@ -40,11 +42,11 @@ class lvisGround(lvisData):
 
   #######################################################
 
-  def setThreshold(self,threshScale):
+  def setThreshold(self,sigThresh):
     '''
     Set a noise threshold
     '''
-    threshold=self.meanNoise+threshScale*self.stdevNoise
+    threshold=self.meanNoise+sigThresh*self.stdevNoise
     return(threshold)
 
 
@@ -53,29 +55,17 @@ class lvisGround(lvisData):
   def CofG(self):
     '''
     Find centre of gravity of denoised waveforms
+    sets this to an array of ground elevation
+    estimates, zG
     '''
 
-    # allocate space for ground elevation
-    self.zG=np.full(self.nWaves,-999.9)  # no data flag for now
+    # allocate space and put no data flags
+    self.zG=np.full((self.nWaves),-999.0)
 
-    from sys import exit
-    print("CofG function not finished. Use online resources or week 4 code to finish")
-    exit()   # leave the program as this method is incomplete
-
-
-  #######################################################
-
-  def reproject(self,inEPSG,outEPSG):
-    '''
-    Reproject footprint coordinates
-    '''
-    # set projections
-    inProj=Proj("epsg:"+str(inEPSG))
-    outProj=Proj("epsg:"+str(outEPSG))
-    # reproject data
-    x,y=transform(inProj,outProj,self.lon,self.lat)
-    self.lon=x
-    self.lat=y
+    # loop over waveforms
+    for i in range(0,self.nWaves):
+      if(np.sum(self.denoised[i])>0.0):   # avoid empty waveforms (clouds etc)
+        self.zG[i]=np.average(self.z[i],weights=self.denoised[i])  # centre of gravity
 
 
   ##############################################
@@ -101,7 +91,7 @@ class lvisGround(lvisData):
 
   ##############################################
 
-  def denoise(self,threshold,smooWidth=0.5,minWidth=3):
+  def denoise(self,threshold,sWidth=0.5,minWidth=3):
     '''
     Denoise waveform data
     '''
@@ -130,8 +120,18 @@ class lvisGround(lvisData):
             self.denoised[i,binList[j]]=0.0   # if not, set to zero
 
       # smooth
-      self.denoised[i]=gaussian_filter1d(self.denoised[i],smooWidth/res)
+      self.denoised[i]=gaussian_filter1d(self.denoised[i],sWidth/res)
 
 
 #############################################################
 
+
+
+  
+  
+# x0 = norm_long(-102.00)
+# print(x0)
+# y0 = -70.6
+# x1 = norm_long(-99.00)
+# print(x1)
+# y1 = -75.4
