@@ -3,8 +3,8 @@ from rasterio.merge import merge
 from glob import glob
 from matplotlib import pyplot as plt
 
-dirpath = glob("/home/s2758252/OOSE/Summative/*tif")
-out_fp = "/home/s2758252/OOSE/Summative/OutputRaster/Merged2015.tif"
+dirpath = glob("/home/s2758252/OOSE/Summative/final-assessment-freddiegi02/*tif")
+out_fp = "/home/s2758252/OOSE/Summative/final-assessment-freddiegi02/MergedAB.tif"
 
 mosacic_files = []
 

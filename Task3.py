@@ -64,7 +64,7 @@ class plotLVIS(lvisGround):
     current_dir = os.getcwd()
 
     # Use the current working directory for the input files and output file
-    dirpath = glob(f"{current_dir}T3/*tif")
+    dirpath = glob("*.tif")
     out_fp = f"{current_dir}/Merged3.tif"
 
     mosacic_files = []
@@ -149,6 +149,7 @@ if __name__=="__main__":
 
 
 lvis.mergeDEM()
+
 current, peak = tracemalloc.get_traced_memory()
 
 # Convert bytes to MB

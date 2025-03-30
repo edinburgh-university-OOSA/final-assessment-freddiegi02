@@ -105,8 +105,8 @@ if __name__=="__main__":
 
   file_count = 1
 
-  step_x = (x1 - x0) / 6 # Divide the x-range into 6 tiles
-  step_y = (y1 - y0) / 6  # Divide the y-range into 6 tiles
+  step_x = (x1 - x0) / 5 # Divide the x-range into 6 tiles
+  step_y = (y1 - y0) / 4  # Divide the y-range into 6 tiles
 
   for tile_x0 in np.arange(x0,x1, step_x):
     tile_x1=tile_x0+step_x
