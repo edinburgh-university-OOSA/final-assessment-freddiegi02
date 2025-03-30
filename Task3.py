@@ -14,6 +14,7 @@ import os #Import for file and directory handling
 from rasterio.merge import merge #Import for merging GeoTIFF files
 import rasterio #Import to help with Raster Data
 from glob import glob #Import to help with multiple files and folders 
+from rasterio.fill import fillnodata
 
 #from Task2 import reprojectLVIS
 
@@ -30,6 +31,7 @@ def getCmdArgs():
   #Add an argument for reading the resolution (Interger)
   ap.add_argument("res", type=int,help=("Spec Res"))
   #Parse the arguments from the command line 
+  ap.add_argument('year', type=str,help=("2009 or 2015"))
   args = ap.parse_args()
   #return the argument
   return args
@@ -52,47 +54,93 @@ class plotLVIS(lvisGround):
 
   def writeDEM(self,res,outName):
     '''Write LVIS ground elevation data to a geotiff'''
-    #res = float(res)
     # call function from tiffExample.py
     writeTiff(self.zG,self.long,self.lat,res,filename=outName,epsg=3031)
     return
     
 
-  def mergeDEM(self):
+  def mergeDEM(self, year):
+    """A function to merge all of the tiles of the raster together """
     
     # Get the current working directory (PWD)
     current_dir = os.getcwd()
 
     # Use the current working directory for the input files and output file
-    dirpath = glob("*.tif")
-    out_fp = f"{current_dir}/Merged3.tif"
+    dirpath = glob(f"{current_dir}/LVIS{year}/Datasets/T3*tif")
+    print(dirpath)
+    out_fp = f"{current_dir}/LVIS{year}/GeoTIFF/Merged{year}.tif"
 
+    #Iniate an empty list
     mosacic_files = []
 
+    # Loop through files in the folder
     for files in dirpath:
-        src = rasterio.open(files)
-        mosacic_files.append(src)
+        src = rasterio.open(files) #Open the files
+        mosacic_files.append(src) #Append the files to the list 
 
+    # Merge the tiles to a mosaic
     mosaic, out_trans = merge(mosacic_files)
 
+
+    # Copy the metadata
     out_meta = src.meta.copy()
 
+
+    #Set the output parameters
     out_meta.update({
-        "driver": "GTiff",
-        "height": mosaic.shape[1],
-        "width": mosaic.shape[2],
-        "transform": out_trans,
-        "count": mosaic.shape[0],
-        "dtype": mosaic.dtype,
+        "driver": "GTiff", #set file type
+        "height": mosaic.shape[1], # Set the height 
+        "width": mosaic.shape[2], # Define the width
+        "transform": out_trans, # Transform the mosaic
+        "count": mosaic.shape[0], #Set the number of layers and bands
+        "dtype": mosaic.dtype, #Set the datatype of the array
     })
 
+    #Open a raster and read the files to it
     with rasterio.open(out_fp, "w", **out_meta) as dest:
         dest.write(mosaic)
 
 
-#Normalise longitude to ensure it stays within a valid range (0-360 degrees)
+  def interpolation(self, year):
+    """Function to Gap fill the arugments """
+
+    # Open the GeoTIFF file for the specfied year 
+    raster_file = rasterio.open(f'LVIS{year}/GeoTIFF/Merged{year}.tif')
+
+    #Define the output file path for the filled raster
+    out_fp = f'LVIS{year}/GeoTIFF/Merged{year}_FILL.tif'
+
+    # Read the first band of the raster file
+    raster = raster_file.read(1)
+
+    # Create a boolean mask where raster values are not equal to -999 (considered as no-data)
+    mask_boolean = (raster !=-999)
+
+    # Use fillnodata function to fill missing data in the raster
+    # Nax Search Distance defines the window size for the fill algorithm
+    filled_raster = fillnodata(raster, mask = mask_boolean, max_search_distance = 1)
+
+
+    #Copy the output metadata
+    out_meta = raster_file.meta.copy()
+    out_meta.update({
+        "driver": "GTiff", #Set the driver
+        "height": filled_raster.shape[0], #Set the height
+        "width": filled_raster.shape[1], #Set the width
+        "transform": raster_file.transform, #Transform the CRS
+        "dtype": filled_raster.dtype, # Set the data type of the array
+    })
+
+    #Open the file using rasterio and write hte file name to it 
+    with rasterio.open(out_fp, "w", **out_meta) as dest:
+        dest.write(filled_raster, 1)
+
+
+
+
 def norm_lon(lon):
-    return (lon) % 360 
+    """Fixes negetive CRS issues"""
+    return (lon) % 360 #Normalise longitude to ensure it stays within a valid range (0-360 degrees)
 
 ##########################################
 
@@ -104,6 +152,7 @@ if __name__=="__main__":
   args = getCmdArgs()
   folder = args.folder #Folder where LVIS data is stored
   res = args.res # Res for DEM file
+  year = args.year
 
   x0 = norm_lon(-102.00) # set min x coord
   y0 = -75.4 # set min y coord
@@ -135,7 +184,8 @@ if __name__=="__main__":
 
                 lvis.reprojectLVIS(3031) # Reproject the data to the Antarctic Polar Stereographic projection (EPSG 3031)
                 lvis.estimateGround()  
-                outName = f"T3_DEM_{file_count}.tif"  # Estimate ground elevation from LVIS data
+                #outName = f"T3_DEM_{file_count}.tif"  # Estimate ground elevation from LVIS data
+                outName = f"LVIS{year}/Datasets/T3_DEM_{file_count}.tif"  # Estimate ground elevation from LVIS data             
                 file_count +=1 #Increase the file size by one each time
                 lvis.writeDEM(res, outName) # Write the DEM data to a GeoTIFF file with the specified resolution
               
@@ -147,12 +197,16 @@ if __name__=="__main__":
           #Print error in file
           print(f"{filepath} Skipped")
 
+#Call the merge function
+lvis.mergeDEM(year)
 
-lvis.mergeDEM()
+#Call the interpolation functon
+lvis.interpolation(year)
 
+#Retrive the peak and current memory in bytes
 current, peak = tracemalloc.get_traced_memory()
 
-# Convert bytes to MB
+# Convert bytes to GB
 current_mb = current / 10**9
 peak_mb = peak / 10**9
 

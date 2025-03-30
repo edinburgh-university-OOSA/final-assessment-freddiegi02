@@ -27,6 +27,8 @@ def getCmdArgs():
   ap.add_argument("filename",type=str,help=("Input filename"))
   # Add a positional argument for the resolution (integer)
   ap.add_argument("res", type=int,help=("Spec Res"))
+  # Add a postioal argument to specify the year of the data
+  ap.add_argument('year', type=str,help=("2009 or 2015"))
   # Parse command-line arguments
   args = ap.parse_args()
   # return that object from this function
@@ -54,35 +56,43 @@ class plotLVIS(lvisGround):
     writeTiff(self.zG,self.long,self.lat,res,filename=outName,epsg=3031)
     return
   
-  def mergeDEM(self):
+  def mergeDEM(self, year):
+    """A function to merge all of the tiles of the raster together """
   
     # Get the current working directory (PWD)
     current_dir = os.getcwd()
 
     # Use the current working directory for the input files and output file
-    dirpath = glob(f"{current_dir}/T2*tif")
-    out_fp = f"{current_dir}/Merged2009.tif"
+    dirpath = glob(f"{current_dir}/LVIS{year}/Datasets/T2*tif")
+    #Outpaths for all of the Merged files
+    out_fp = f"{current_dir}/LVIS{year}/GeoTIFF/Merged{2009}.tif"
 
+    #Intiaties an empty list 
     mosacic_files = []
 
+    # Loops over the folders in the directory
     for files in dirpath:
         src = rasterio.open(files)
-        mosacic_files.append(src)
+        mosacic_files.append(src) # appends all of the files to the list
 
+    #merge multiple rasteer files into one mosaic
     mosaic, out_trans = merge(mosacic_files)
 
+    #Creates a copy of the meta data to retain info about the general stucture
     out_meta = src.meta.copy()
 
+    #Update the metadata
     out_meta.update({
-        "driver": "GTiff",
-        "height": mosaic.shape[1],
-        "width": mosaic.shape[2],
-        "transform": out_trans,
-        "count": mosaic.shape[0],
-        "dtype": mosaic.dtype,
+        "driver": "GTiff", #Set to GeoTiff format
+        "height": mosaic.shape[1], #Set the height of the mosaic
+        "width": mosaic.shape[2], #Set the width of the mosaic
+        "transform": out_trans, # Transform the mosaic
+        "count": mosaic.shape[0], #Set the number of layers/bands
+        "dtype": mosaic.dtype, #Set the data type of the array
     })
-
+    # Open a new raster file for writing using rasterio
     with rasterio.open(out_fp, "w", **out_meta) as dest:
+        # Write the mosaic data to the file
         dest.write(mosaic)
 
 def norm_lon(lon):
@@ -96,14 +106,16 @@ if __name__=="__main__":
   args = getCmdArgs()
   filename = args.filename #Store input filename
   res = args.res #Store spatial resolution
+  year = args.res #Store the year
 
 
   x0 = norm_lon(-102.00) # set min x coord
   y0 = -75.4 # set min y coord
   x1 = norm_lon(-99.00) #set max x coord
   y1 = -74.6 #set max y coord
+ 
 
-  file_count = 1
+  file_count = 1 #Make the file count 1 at the start
 
   step_x = (x1 - x0) / 5 # Divide the x-range into 6 tiles
   step_y = (y1 - y0) / 4  # Divide the y-range into 6 tiles
@@ -119,18 +131,21 @@ if __name__=="__main__":
 
 
         lvis.reprojectLVIS(3031) # Reproject the data to the Antarctic Polar Stereographic projection (EPSG 3031)
-        lvis.estimateGround()  
-        outName = f"T2_DEM_{file_count}.tif"  # Estimate ground elevation from LVIS data
+        lvis.estimateGround() #Call the estimate ground function
+        outName = f"LVIS{year}/Datasets/T2_DEM_{file_count}.tif"  # Estimate ground elevation from LVIS data
         file_count +=1 #Increase the file size by one each time
         lvis.writeDEM(res, outName) # Write the DEM data to a GeoTIFF file with the specified resolution
       
       except AttributeError as e:
-        print(f"{filename} Skipped")
+        print(f"{filename} Skipped") #Print the files which have been skipped
   
-lvis.mergeDEM()
+# Call the merge fuction 
+lvis.mergeDEM(year) 
+
+# Call Memory Function to get the currnet and peak memory in bytes
 current, peak = tracemalloc.get_traced_memory()
 
-# Convert bytes to MB
+# Convert bytes to GB
 current_mb = current / 10**9
 peak_mb = peak / 10**9
 
