@@ -1,31 +1,31 @@
 import rasterio
-from rasterio.fill import fillnodata
-import numpy as np
-import matplotlib.pyplot as plt
+from rasterio.merge import merge
+from glob import glob
+from src.handleTiff import TiffHandle  # Corrected import statement
 
+# Get the list of tif files
+dirpath = glob("LVIS2015/Datasets/*tif")
+out_fp = "/home/s2758252/OOSE/Summative/final-assessment-freddiegi02/Merged2015.tif"
 
-raster_file = rasterio.open('LVIS2009/GeoTIFF/Merged2009.tif')
-out_fp = "/home/s2758252/OOSE/Summative/final-assessment-freddiegi02/Merged2009FILL.tif"
+mosaic_files = []
 
-raster = raster_file.read(1)
+# Open each file without 'with' statement to keep the file open for merge
+for file in dirpath:
+    src = rasterio.open(file)
+    mosaic_files.append(src)
 
-mask_boolean = (raster !=-999)
+# Merge the files
+mosaic, out_trans = merge(mosaic_files)
 
-filled_raster = fillnodata(raster, mask = mask_boolean, max_search_distance = 100)
+# Get the resolution and bounding box from the merged raster
+res = out_trans[0]  # Pixel resolution in X direction
+minX = out_trans[2]  # X coordinate of the top-left corner
+maxY = out_trans[5]  # Y coordinate of the top-left corner
 
+# Create an instance of TiffHandle and save the mosaic
+tiff_handler = TiffHandle()  # Corrected constructor
+tiff_handler.writeTiff(mosaic[0], filename=out_fp, epsg=30321, res=res, minX=minX, maxY=maxY)
 
-out_meta = raster_file.meta.copy()
-out_meta.update({
-    "driver": "GTiff",
-    "height": filled_raster.shape[0],
-    "width": filled_raster.shape[1],
-    "transform": raster_file.transform,
-    "dtype": filled_raster.dtype,
-        # Ensure correct data typea
-})
-
-with rasterio.open(out_fp, "w", **out_meta) as dest:
-     dest.write(filled_raster, 1)
-
-
-
+# Close the datasets after finishing the merge
+for src in mosaic_files:
+    src.close()

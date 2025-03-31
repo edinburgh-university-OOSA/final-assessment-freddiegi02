@@ -1,84 +1,47 @@
-
-
-'''
-A class to handle geotiffs
-'''
-
-#######################################################
-# import necessary packages
-
-from pyproj import Proj, transform # package for reprojecting data
-from osgeo import gdal             # package for handling geotiff data
-from osgeo import osr              # package for handling projection information
-from gdal import Warp
+from osgeo import gdal, osr
 import numpy as np
 
-
-#######################################################
-
-class tiffHandle():
-  '''
-  Class to handle geotiff files
-  '''
-
-  ########################################
-
-  def __init__(self,filename):
+class TiffHandle():
     '''
-    Class initialiser
-    Does nothing as this is only an example
+    Class to handle GeoTIFF file writing
     '''
 
+    def __init__(self):
+        '''
+        Class initializer (No need for complex properties)
+        '''
+        pass
 
-  ########################################
+    def writeTiff(self, data, filename="output.tif", epsg=30321, res=None, minX=None, maxY=None):
+        '''
+        Write a GeoTIFF from a raster layer
+        '''
+        # Ensure essential parameters are provided
+        if res is None or minX is None or maxY is None:
+            raise ValueError("Resolution, minX, and maxY must be provided")
 
-  def writeTiff(self,data,filename="chm.tif",epsg=27700):
-    '''
-    Write a geotiff from a raster layer
-    '''
+        # Get the shape of the data (mosaic)
+        nY, nX = data.shape  # Check shape of data
+        print(f"Data shape: {nY} x {nX}")
 
-    # set geolocation information (note geotiffs count down from top edge in Y)
-    geotransform = (self.minX, self.res, 0, self.maxY, 0, -1*self.res)
+        # Adjust for the projection (flip X and Y based on EPSG:30321)
+        # In EPSG:30321, it seems minX is the maximum X and maxY is the minimum Y
+        geotransform = (minX, res, 0, maxY, 0, -res)
+        print(f"Geotransform: {geotransform}")
 
-    # load data in to geotiff object
-    dst_ds = gdal.GetDriverByName('GTiff').Create(filename, self.nX, self.nY, 1, gdal.GDT_Float32)
+        # Create the GeoTIFF file
+        dst_ds = gdal.GetDriverByName('GTiff').Create(filename, nX, nY, 1, gdal.GDT_Float32)
+        dst_ds.SetGeoTransform(geotransform)
 
-    dst_ds.SetGeoTransform(geotransform)    # specify coords
-    srs = osr.SpatialReference()            # establish encoding
-    srs.ImportFromEPSG(epsg)                # WGS84 lat/long
-    dst_ds.SetProjection(srs.ExportToWkt()) # export coords to file
-    dst_ds.GetRasterBand(1).WriteArray(data)  # write image to the raster
-    dst_ds.GetRasterBand(1).SetNoDataValue(-999)  # set no data value
-    dst_ds.FlushCache()                     # write to disk
-    dst_ds = None
+        # Set the spatial reference (projection)
+        srs = osr.SpatialReference()
+        srs.ImportFromEPSG(epsg)
+        dst_ds.SetProjection(srs.ExportToWkt())
 
-    print("Image written to",filename)
-    return
+        # Write the data to the GeoTIFF
+        dst_ds.GetRasterBand(1).WriteArray(data)
+        dst_ds.GetRasterBand(1).SetNoDataValue(-999)
+        dst_ds.FlushCache()  # Save to disk
 
-
-  ########################################
-
-  def readTiff(self,filename):
-    '''
-    Read a geotiff in to RAM
-    '''
-
-    # open a dataset object
-    ds=gdal.Open(filename)
-    # could use gdal.Warp to reproject if wanted?
-
-    # read data from geotiff object
-    self.nX=ds.RasterXSize             # number of pixels in x direction
-    self.nY=ds.RasterYSize             # number of pixels in y direction
-    # geolocation tiepoint
-    transform_ds = ds.GetGeoTransform()# extract geolocation information
-    self.xOrigin=transform_ds[0]       # coordinate of x corner
-    self.yOrigin=transform_ds[3]       # coordinate of y corner
-    self.pixelWidth=transform_ds[1]    # resolution in x direction
-    self.pixelHeight=transform_ds[5]   # resolution in y direction
-    # read data. Returns as a 2D numpy array
-    self.data=ds.GetRasterBand(1).ReadAsArray(0,0,self.nX,self.nY)
-
-
-#######################################################
-
+        dst_ds = None  # Close the file
+        print(f"Image written to {filename}")

@@ -118,7 +118,7 @@ class plotLVIS(lvisGround):
 
     # Use fillnodata function to fill missing data in the raster
     # Nax Search Distance defines the window size for the fill algorithm
-    filled_raster = fillnodata(raster, mask = mask_boolean, max_search_distance = 1)
+    filled_raster = fillnodata(raster, mask = mask_boolean, max_search_distance = 50)
 
 
     #Copy the output metadata
@@ -154,10 +154,10 @@ if __name__=="__main__":
   res = args.res # Res for DEM file
   year = args.year
 
-  x0 = norm_lon(-102.00) # set min x coord
-  y0 = -75.4 # set min y coord
-  x1 = norm_lon(-99.00) #set max x coord
-  y1 = -74.6 #set max y coord
+  x0 = norm_lon(-100.20) # set min x coord
+  y0 = -75.233 # set min y coord
+  x1 = norm_lon(-99.0) #set max x coord
+  y1 = -75.152 #set max y coord
 
   file_count = 1 #Initialise a counter
 
@@ -203,16 +203,15 @@ lvis.mergeDEM(year)
 #Call the interpolation functon
 lvis.interpolation(year)
 
-#Retrive the peak and current memory in bytes
-current, peak = tracemalloc.get_traced_memory()
+peak = tracemalloc.get_traced_memory()
 
-# Convert bytes to GB
-current_mb = current / 10**9
-peak_mb = peak / 10**9
+# Convert bytes to MB for better readability
+peak_mb = peak[0] / 10**9  # Peak memory in GB
+current_mb = peak[1] / 10**9  # Current memory in GB
 
 # Print memory usage details
-print(f"Current memory usage: {current_mb:.2f} GB")
 print(f"Peak memory usage: {peak_mb:.2f} GB")
+print(f"Current memory usage: {current_mb:.2f} GB")
 
 # Stop tracing memory
 tracemalloc.stop()

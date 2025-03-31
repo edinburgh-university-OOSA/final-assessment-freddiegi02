@@ -41,17 +41,17 @@ class plotLVIS(lvisGround):
     """Plots the wavefrom for the given index"""
 
     # # Extract the waveform data
-    # wave_data = self.waves[i]
+    wave_data = self.waves[i]
     
-    # # Find the first occurrence of zero and plot up to that point
-    # cutoff_index = len(wave_data)
-    # for j, value in enumerate(wave_data):
-    #     if value == 0:
-    #         cutoff_index = j
-    #         break
+    # Find the first occurrence of zero and plot up to that point
+    cutoff_index = len(wave_data)
+    for j, value in enumerate(wave_data):
+        if value == 0:
+            cutoff_index = j
+            break
 
     # Plot only up to the first zero
-    #plt.plot(wave_data[:cutoff_index], self.z[i][:cutoff_index])
+    plt.plot(wave_data[:cutoff_index], self.z[i][:cutoff_index])
     plt.plot(self.waves[i], self.z[i]) #plot waveform return vs elevation 
     plt.xlabel("Waveform return") # X-axis label
     plt.ylabel("Elevation (m)") # Y-axis label
@@ -84,3 +84,7 @@ lvis=plotLVIS(filename,minX=x0,minY=y0,maxX=x1,maxY=y1,setElev=True)
 #Plot the choosen waveform
 lvis.plotWave(waveform)
 
+
+# Task 1 bounds?
+# Task 5
+# ReadMe + Duplicate Code + Write GEOTIFF
