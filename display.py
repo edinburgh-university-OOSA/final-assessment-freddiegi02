@@ -1,9 +1,10 @@
 import rasterio
 import matplotlib.pyplot as plt
-
+filename = 'Merged2009.tif' 
 # Open the raster file
-filename = 'LVIS2015/GeoTIFF/Merged2015.tif'  # Replace with your raster file path
-#filename = 'LVIS2015/GeoTIFF/Merged2015_FILL.tif'  # Replace with your raster file path
+#filename = 'LVIS2015/GeoTIFF/Merged2015.tif'  # Replace with your raster file path
+#filename = 'LVIS2015/GeoTIFF/Merged2015_FILL.tif'
+#   # Replace with your raster file path
 with rasterio.open(filename) as src:
     # Read the data (this reads all bands by default)
     band1 = src.read(1)  # Read the first band (e.g., grayscale)

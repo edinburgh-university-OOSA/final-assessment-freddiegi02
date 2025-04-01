@@ -4,8 +4,8 @@ from glob import glob
 from src.handleTiff import TiffHandle  # Corrected import statement
 
 # Get the list of tif files
-dirpath = glob("LVIS2015/Datasets/*tif")
-out_fp = "/home/s2758252/OOSE/Summative/final-assessment-freddiegi02/Merged2015.tif"
+dirpath = glob("LVIS2009/Datasets/*tif")
+out_fp = "/home/s2758252/OOSE/Summative/final-assessment-freddiegi02/Merged2009.tif"
 
 mosaic_files = []
 
