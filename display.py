@@ -1,6 +1,6 @@
 import rasterio
 import matplotlib.pyplot as plt
-filename = 'Merged2009.tif' 
+filename = 'aligned_raster3.tif' 
 # Open the raster file
 #filename = 'LVIS2015/GeoTIFF/Merged2015.tif'  # Replace with your raster file path
 #filename = 'LVIS2015/GeoTIFF/Merged2015_FILL.tif'

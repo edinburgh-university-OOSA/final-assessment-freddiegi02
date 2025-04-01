@@ -1,31 +1,24 @@
 import rasterio
-from rasterio.merge import merge
-from glob import glob
-from src.handleTiff import TiffHandle  # Corrected import statement
+import numpy as np
 
-# Get the list of tif files
-dirpath = glob("LVIS2009/Datasets/*tif")
-out_fp = "/home/s2758252/OOSE/Summative/final-assessment-freddiegi02/Merged2009.tif"
 
-mosaic_files = []
+with rasterio.open('LVIS2015/GeoTIFF/Merged2015.tif') as src1, rasterio.open('LVIS2009/GeoTIFF/Merged2009.tif') as src2:
+    data1 = src1.read(1)
 
-# Open each file without 'with' statement to keep the file open for merge
-for file in dirpath:
-    src = rasterio.open(file)
-    mosaic_files.append(src)
+    # extract metadata from the first raster
+    meta = src1.meta.copy()
+    print(meta)
 
-# Merge the files
-mosaic, out_trans = merge(mosaic_files)
+    # read the window of the second raster with the same extent as the first raster
+    window = src2.window(*src1.bounds)
 
-# Get the resolution and bounding box from the merged raster
-res = out_trans[0]  # Pixel resolution in X direction
-minX = out_trans[2]  # X coordinate of the top-left corner
-maxY = out_trans[5]  # Y coordinate of the top-left corner
+    # read the data from the second raster with the same window as first raster
+    data2 = src2.read(1, window=window, boundless=True, fill_value=-999)
+    data2 = np.where(data2 == src2.nodata, 0, data2)
+    print(window)
+    # calculate the difference
+    data = data1 - data2
 
-# Create an instance of TiffHandle and save the mosaic
-tiff_handler = TiffHandle()  # Corrected constructor
-tiff_handler.writeTiff(mosaic[0], filename=out_fp, epsg=30321, res=res, minX=minX, maxY=maxY)
-
-# Close the datasets after finishing the merge
-for src in mosaic_files:
-    src.close()
+    # write the result to a new raster
+    with rasterio.open("output.tif", 'w', **meta) as dst:
+        dst.write(data,1)
