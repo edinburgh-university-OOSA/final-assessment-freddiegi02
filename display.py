@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 filename = 'aligned_raster3.tif' 
 # Open the raster file
 #filename = 'LVIS2015/GeoTIFF/Merged2015.tif'  # Replace with your raster file path
-#filename = 'LVIS2015/GeoTIFF/Merged2015_FILL.tif'
+filename = 'LVIS2009/GeoTIFF/Merged2009_FIT.tif'
 #   # Replace with your raster file path
 with rasterio.open(filename) as src:
     # Read the data (this reads all bands by default)
