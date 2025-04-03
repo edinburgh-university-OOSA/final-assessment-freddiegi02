@@ -55,6 +55,7 @@ class plotLVIS(lvisGround):
     plt.plot(self.waves[i], self.z[i]) #plot waveform return vs elevation 
     plt.xlabel("Waveform return") # X-axis label
     plt.ylabel("Elevation (m)") # Y-axis label
+    plt.savefig("Output_Images/Waveform.png", dpi=75, bbox_inches='tight')
     plt.show() #Dispaly the plot
 
 

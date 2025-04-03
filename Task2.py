@@ -65,7 +65,7 @@ class plotLVIS(lvisGround):
     # Use the current working directory for the input files and output file
     dirpath = glob(f"{current_dir}/LVIS{year}/Datasets/T2*tif")
     #Outpaths for all of the Merged files
-    out_fp = f"{current_dir}/LVIS{year}/GeoTIFF/Merged{2009}.tif"
+    out_fp = f"{current_dir}/LVIS{year}/GeoTIFF/T2_Merged{year}.tif"
 
     #Intiaties an empty list 
     mosacic_files = []
@@ -95,6 +95,13 @@ class plotLVIS(lvisGround):
         # Write the mosaic data to the file
         dest.write(mosaic)
 
+    plt.imshow(mosaic[0], cmap='viridis')  # You can adjust the colormap as needed
+    plt.colorbar(label="Elevation (m)")  # Add a color bar for reference
+    plt.title(f"PIG Elevation for the {year}")
+
+    # Save the figure as a PNG with the specified DPI and tight bounding box
+    plt.savefig(f"Output_Images/PIG_Single_{year}.png", dpi=75, bbox_inches='tight')
+
 def norm_lon(lon):
     #Normalise longitude to ensure values remain within a valid range (0-360 degrees)
     return (lon) % 360
@@ -106,7 +113,7 @@ if __name__=="__main__":
   args = getCmdArgs()
   filename = args.filename #Store input filename
   res = args.res #Store spatial resolution
-  year = args.res #Store the year
+  year = args.year #Store the year
 
 
   x0 = norm_lon(-102.00) # set min x coord
@@ -118,7 +125,7 @@ if __name__=="__main__":
   file_count = 1 #Make the file count 1 at the start
 
   step_x = (x1 - x0) / 5 # Divide the x-range into 6 tiles
-  step_y = (y1 - y0) / 4  # Divide the y-range into 6 tiles
+  step_y = (y1 - y0) / 5 # Divide the y-range into 6 tiles
 
   for tile_x0 in np.arange(x0,x1, step_x):
     tile_x1=tile_x0+step_x

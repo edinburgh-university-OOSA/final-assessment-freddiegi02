@@ -6,7 +6,7 @@ and merges them into one output file.
 import tracemalloc
 from src.tiffExample import writeTiff # Import function to write GeoTIFF files
 from src.processLVIS import lvisGround #Importing lvisGround class from processLVIS
-from crs import extent
+from src.WriteExtent import extent
 from matplotlib import pyplot as plt #Import for plotting
 import numpy as np #Import for numerical operations 
 import argparse #Import for handling command-line arguments 
@@ -70,7 +70,7 @@ class plotLVIS(lvisGround):
     # Use the current working directory for the input files and output file
     dirpath = glob(f"{current_dir}/LVIS{year}/Datasets/T3*tif")
     print(dirpath)
-    out_fp = f"{current_dir}/LVIS{year}/GeoTIFF/Merged{year}.tif"
+    out_fp = f"{current_dir}/LVIS{year}/GeoTIFF/T3_Merged{year}.tif"
 
     #Iniate an empty list
     mosacic_files = []
@@ -107,10 +107,11 @@ class plotLVIS(lvisGround):
     """Function to Gap fill the arugments """
 
     # Open the GeoTIFF file for the specfied year 
-    raster_file = rasterio.open(f'LVIS{year}/GeoTIFF/Merged{year}_FIT.tif')
+    raster_file = rasterio.open(f'LVIS{year}/GeoTIFF/T3_Merged{year}_FIT.tif')
 
     #Define the output file path for the filled raster
-    out_fp = f'LVIS{year}/GeoTIFF/Merged{year}_FILL.tif'
+    out_fp = f'LVIS{year}/GeoTIFF/T3_Merged{year}_FILL.tif'
+    
 
     # Read the first band of the raster file
     raster = raster_file.read(1)
@@ -137,6 +138,13 @@ class plotLVIS(lvisGround):
     with rasterio.open(out_fp, "w", **out_meta) as dest:
         dest.write(filled_raster, 1)
 
+        # Plot the filled raster
+    plt.imshow(filled_raster, cmap='viridis')  # You can adjust the colormap as needed
+    plt.colorbar(label="Elevation (m)")  # Add a color bar for reference
+    plt.title(f"PIG Elevation for Year {year}")
+
+    # Save the figure as a PNG with the specified DPI and tight bounding box
+    plt.savefig(f"Output_Images/PIG{year}.png", dpi=75, bbox_inches='tight')
 
 def norm_lon(lon):
     """Fixes negetive CRS issues"""
@@ -207,8 +215,8 @@ min_x, min_y = transformer.transform(x0, y0)
 max_x, max_y = transformer.transform(x1, y1)
 bouding_box = (max_x, min_y, min_x, max_y)
 
-input_raster = f'LVIS{year}/GeoTIFF/Merged{year}.tif'
-output_raster = f'LVIS{year}/GeoTIFF/Merged{year}_FIT.tif'
+input_raster = f'LVIS{year}/GeoTIFF/T3_Merged{year}.tif'
+output_raster = f'LVIS{year}/GeoTIFF/T3_Merged{year}_FIT.tif'
 print(f"Input Raster: {input_raster}")
 print(f"Output Raster: {output_raster}")
 print(f"Common Bounds: {bouding_box}")

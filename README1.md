@@ -20,10 +20,10 @@ git clone git@github.com:edinburgh-university-OOSA/final-assessment-freddiegi02.
 Then, navigate to the final-assessment-freddiegi02 directory using the cd command
 
 ## Layout of the project
-
+```
 │── src/
 │   │── handleTiff.py
-│   │── processLVIS.py
+│   │── processLVIS.pyV
 │   │── tiffEample.py
 │── display.py
 │── lvisClass.py
@@ -38,7 +38,7 @@ Then, navigate to the final-assessment-freddiegi02 directory using the cd comman
 │── LVIS2015/
 │   ├── Datasets/
 │   ├── GeoTIFF/
-
+```
 The src directory contains the scripts were provided.
 The display.py script is used to display the data. 
 The README.md file contains the instructions for running the code.
@@ -51,30 +51,37 @@ To run the code you will need to use a python command line parser for each task.
 
 For Task 1, run the following command:
 ```
-python Task1.py 
+python Task1.py /geos/netdata/oosa/assignment/lvis/2015/ILVIS1B_AQ2015_1012_R1605_070498.h5 30 
 ```
 This will run the code in the Task1.py file and display the following output:
 
-### Running the code
-To run the code you will need to use a python command line parser for each task.
+![Alt text](Output_Images/Waveform.png)
 
 For Task 2, run the following command:
 ```
 python Task2.py 
 ```
-This will run the code in the Task2.py file and display the following output:
+This will run the code in the Task2.py file and display the following output: 
+
+![Alt text](Output_Images/PIG_Single_2009.png)
+
 
 For Task 3, run the following command:
 ```
-python Task3.py 
+python Task1.py /geos/netdata/oosa/assigment/lvis/2015 30 2015
 ```
 This will run the code in the Task3.py file and display the following output:
+
+
+![Alt text](Output_Images/PIG2015.png) ![Alt text](Output_Images/PIG2009.png)
 
 For Task 4, run the following command:
 ```
 python Task4.py 
 ```
 This will run the code in the Task4.py file and display the following output:
+
+![Alt text](Output_Images/Elevation_Change.png)
 
 
 ### Version

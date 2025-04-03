@@ -14,7 +14,7 @@ import h5py
 class lvisData(object):
   '''
   LVIS data handler
-  '''
+  '''  
 
   def __init__(self,filename,setElev=False,minX=-100000000,maxX=100000000,minY=-1000000000,maxY=100000000,onlyBounds=False):
     '''
