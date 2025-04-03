@@ -1,24 +1,30 @@
-import rasterio
-import numpy as np
+import geopandas as gpd
+from shapely.geometry import Point
+
+# Sample function to normalize longitude (assuming simple normalization between -180 and 180)
+def norm_lon(lon):
+    # Normalize longitude to be between -180 and 180 (just as an example)
+    return ((lon + 180) % 360) - 180
+
+# Given points
+
+x0 = norm_lon(-100.20) # set min x coord
+y0 = -75.195 # set min y coord
+x1 = norm_lon(-99.0) #set max x coord
+y1 = -75.185 #set max y coord
 
 
-with rasterio.open('LVIS2015/GeoTIFF/Merged2015.tif') as src1, rasterio.open('LVIS2009/GeoTIFF/Merged2009.tif') as src2:
-    data1 = src1.read(1)
+# Create Point geometries for each coordinate pair
+point0 = Point(x0, y0)
+point1 = Point(x1, y1)
 
-    # extract metadata from the first raster
-    meta = src1.meta.copy()
-    print(meta)
+# Create a GeoDataFrame to hold the points
+gdf = gpd.GeoDataFrame({'geometry': [point0, point1]})
 
-    # read the window of the second raster with the same extent as the first raster
-    window = src2.window(*src1.bounds)
+# Set a coordinate reference system (CRS) for the shapefile (WGS 84)
+gdf.set_crs("EPSG:4326", inplace=True)
 
-    # read the data from the second raster with the same window as first raster
-    data2 = src2.read(1, window=window, boundless=True, fill_value=-999)
-    data2 = np.where(data2 == src2.nodata, 0, data2)
-    print(window)
-    # calculate the difference
-    data = data1 - data2
+# Save the GeoDataFrame to a shapefile
+gdf.to_file("points.shp")
 
-    # write the result to a new raster
-    with rasterio.open("output.tif", 'w', **meta) as dst:
-        dst.write(data,1)
+print("Shapefile created successfully.")

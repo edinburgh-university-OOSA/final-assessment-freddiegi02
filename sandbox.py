@@ -107,7 +107,7 @@ class plotLVIS(lvisGround):
     """Function to Gap fill the arugments """
 
     # Open the GeoTIFF file for the specfied year 
-    raster_file = rasterio.open(f'LVIS{year}/GeoTIFF/Merged{year}.tif')
+    raster_file = rasterio.open(f'LVIS{year}/GeoTIFF/Merged{year}_FIT.tif')
 
     #Define the output file path for the filled raster
     out_fp = f'LVIS{year}/GeoTIFF/Merged{year}_FILL.tif'
@@ -120,7 +120,7 @@ class plotLVIS(lvisGround):
 
     # Use fillnodata function to fill missing data in the raster
     # Nax Search Distance defines the window size for the fill algorithm
-    filled_raster = fillnodata(raster, mask = mask_boolean, max_search_distance = 20)
+    filled_raster = fillnodata(raster, mask = mask_boolean, max_search_distance = 50)
 
 
     #Copy the output metadata
@@ -200,21 +200,21 @@ if __name__=="__main__":
 #Call the merge function
 lvis.mergeDEM(year)
 #Call the interpolation functon
-lvis.interpolation(year)
+#lvis.interpolation(year)
 
 transformer = Transformer.from_crs("EPSG:4326", "EPSG:3031", always_xy=True)
 min_x, min_y = transformer.transform(x0, y0)
 max_x, max_y = transformer.transform(x1, y1)
 bouding_box = (max_x, min_y, min_x, max_y)
 
-input_raster = f'LVIS{year}/GeoTIFF/Merged{year}_FILL.tif'
+input_raster = f'LVIS{year}/GeoTIFF/Merged{year}.tif'
 output_raster = f'LVIS{year}/GeoTIFF/Merged{year}_FIT.tif'
 print(f"Input Raster: {input_raster}")
 print(f"Output Raster: {output_raster}")
 print(f"Common Bounds: {bouding_box}")
 
 extent(input_raster, output_raster, bouding_box)
-
+lvis.interpolation(year)
 peak = tracemalloc.get_traced_memory()
 
 # Convert bytes to MB for better readability
