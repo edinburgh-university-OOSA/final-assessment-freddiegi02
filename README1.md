@@ -66,7 +66,10 @@ This will run the code in the Task2.py file and display the following output:
 ![Alt text](Output_Images/PIG_Single_2009.png)
 
 
-For Task 3, run the following command:
+For Task 3, run the following command:def norm_lon(lon):
+    #Normalise longitude to ensure values remain within a valid range (0-360 degrees)
+    return (lon) % 360
+
 ```
 python Task1.py /geos/netdata/oosa/assigment/lvis/2015 30 2015
 ```

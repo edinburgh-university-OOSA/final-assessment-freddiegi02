@@ -1,11 +1,8 @@
 
 from src.processLVIS import lvisGround #Importing lvisGround class from processLVIS
-from pyproj import Proj, transform #Importing Proj and transform to change the CRS
 from matplotlib import pyplot as plt #Import for plotting
 import numpy as np #Import for numerical operations 
 import argparse #Import for handling command-line arguments
-
-
 
 
 ##########################################
@@ -30,12 +27,6 @@ class plotLVIS(lvisGround):
   '''A class, ineriting from lvisData
      and add a plotting method'''
 
-  def reprojectLVIS(self, outEPSG):
-    '''Reprojects the geolocation data to a specified ESPG'''
-    inProj=Proj("epsg:4326") #Input projection (WGS84)
-    outProj=Proj("epsg:"+str(outEPSG)) #Output projection based on ESPG code
-    self.long, self.lat=transform(inProj, outProj,self.lat,self.lon) #Transform projection 
-
 
   def plotWave(self, i):
     """Plots the wavefrom for the given index"""
@@ -57,7 +48,6 @@ class plotLVIS(lvisGround):
     plt.ylabel("Elevation (m)") # Y-axis label
     plt.savefig("Output_Images/Waveform.png", dpi=75, bbox_inches='tight')
     plt.show() #Dispaly the plot
-
 
 
 ##########################################
@@ -86,6 +76,3 @@ lvis=plotLVIS(filename,minX=x0,minY=y0,maxX=x1,maxY=y1,setElev=True)
 lvis.plotWave(waveform)
 
 
-# Task 1 bounds?
-# Task 5
-# ReadMe + Duplicate Code + Write GEOTIFF

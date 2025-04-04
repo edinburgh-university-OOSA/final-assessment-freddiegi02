@@ -6,7 +6,6 @@ Plotting a singular plot
 import tracemalloc
 from src.tiffExample import writeTiff # Import function to write GeoTIFF files
 from src.processLVIS import lvisGround #Importing lvisGround class from processLVIS
-from pyproj import Proj, transform #Importing Proj and transform to change the CRS
 from matplotlib import pyplot as plt #Import for plotting
 import numpy as np #Import for numerical operations 
 import argparse #Import for handling command-line arguments 
@@ -29,6 +28,7 @@ def getCmdArgs():
   ap.add_argument("res", type=int,help=("Spec Res"))
   # Add a postioal argument to specify the year of the data
   ap.add_argument('year', type=str,help=("2009 or 2015"))
+  #ap.add_argument("waveform",type=int,help=("Input Number"))
   # Parse command-line arguments
   args = ap.parse_args()
   # return that object from this function
@@ -42,69 +42,14 @@ class plotLVIS(lvisGround):
   for reprojecting geolocation data and writing DEM files.
   """
 
-  def reprojectLVIS(self, outEPSG):
-    '''A method to reproject the geolocation data'''
-    inProj=Proj("epsg:4326")
-    outProj=Proj("epsg:"+str(outEPSG))
-    self.long, self.lat=transform(inProj, outProj,self.lat,self.lon)
-
-
   def writeDEM(self,res,outName):
     '''Write LVIS ground elevation data to a geotiff'''
-    #res = float(res)
-    # call function from tiffExample.py
     writeTiff(self.zG,self.long,self.lat,res,filename=outName,epsg=3031)
     return
-  
-  def mergeDEM(self, year):
-    """A function to merge all of the tiles of the raster together """
-  
-    # Get the current working directory (PWD)
-    current_dir = os.getcwd()
-
-    # Use the current working directory for the input files and output file
-    dirpath = glob(f"{current_dir}/LVIS{year}/Datasets/T2*tif")
-    #Outpaths for all of the Merged files
-    out_fp = f"{current_dir}/LVIS{year}/GeoTIFF/T2_Merged{year}.tif"
-
-    #Intiaties an empty list 
-    mosacic_files = []
-
-    # Loops over the folders in the directory
-    for files in dirpath:
-        src = rasterio.open(files)
-        mosacic_files.append(src) # appends all of the files to the list
-
-    #merge multiple rasteer files into one mosaic
-    mosaic, out_trans = merge(mosacic_files)
-
-    #Creates a copy of the meta data to retain info about the general stucture
-    out_meta = src.meta.copy()
-
-    #Update the metadata
-    out_meta.update({
-        "driver": "GTiff", #Set to GeoTiff format
-        "height": mosaic.shape[1], #Set the height of the mosaic
-        "width": mosaic.shape[2], #Set the width of the mosaic
-        "transform": out_trans, # Transform the mosaic
-        "count": mosaic.shape[0], #Set the number of layers/bands
-        "dtype": mosaic.dtype, #Set the data type of the array
-    })
-    # Open a new raster file for writing using rasterio
-    with rasterio.open(out_fp, "w", **out_meta) as dest:
-        # Write the mosaic data to the file
-        dest.write(mosaic)
-
-    plt.imshow(mosaic[0], cmap='viridis')  # You can adjust the colormap as needed
-    plt.colorbar(label="Elevation (m)")  # Add a color bar for reference
-    plt.title(f"PIG Elevation for the {year}")
-
-    # Save the figure as a PNG with the specified DPI and tight bounding box
-    plt.savefig(f"Output_Images/PIG_Single_{year}.png", dpi=75, bbox_inches='tight')
 
 def norm_lon(lon):
-    #Normalise longitude to ensure values remain within a valid range (0-360 degrees)
-    return (lon) % 360
+    """Fixes negetive CRS issues"""
+    return (lon) % 360 #Normalise longitude to ensure it stays within a valid range (0-360 degrees)
 
 if __name__=="__main__":
   '''Main block'''
@@ -121,7 +66,6 @@ if __name__=="__main__":
   x1 = norm_lon(-99.00) #set max x coord
   y1 = -74.6 #set max y coord
  
-
   file_count = 1 #Make the file count 1 at the start
 
   step_x = (x1 - x0) / 5 # Divide the x-range into 6 tiles
@@ -146,8 +90,19 @@ if __name__=="__main__":
       except AttributeError as e:
         print(f"{filename} Skipped") #Print the files which have been skipped
   
-# Call the merge fuction 
-lvis.mergeDEM(year) 
+# Call the merge fuction
+# Use the current working directory for the input files and output file
+current_dir = os.getcwd()
+dirpath = glob(f"{current_dir}/LVIS{year}/Datasets/T2*tif")
+#Outpaths for all of the Merged files
+out_fp = f"{current_dir}/LVIS{year}/GeoTIFF/T2_Merged{year}.tif"
+lvis.mergeDEM(year, dirpath, out_fp) 
+plt.title(f"PIG Elevation for the {year}")
+# Save the figure as a PNG with the specified DPI and tight bounding box
+plt.savefig(f"Output_Images/PIG_Single_{year}.png", dpi=75, bbox_inches='tight')
+
+
+
 
 # Call Memory Function to get the currnet and peak memory in bytes
 current, peak = tracemalloc.get_traced_memory()

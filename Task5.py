@@ -20,7 +20,7 @@ def calculate_ice_loss(LVIS2009, LVIS2015, output_image="Output_Images/Elevation
 
     total_ice_loss_volume = Total_Ice_Loss * pixel_area
 
-    total_ice_loss_volume_km3 = total_ice_loss_volume / 1_000_000_000  
+    total_ice_loss_volume_km3 = total_ice_loss_volume / 1000000000  
 
     print(f"Total Ice Loss Volume: {total_ice_loss_volume_km3:.3f} km³")
 
