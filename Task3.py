@@ -7,17 +7,13 @@ import tracemalloc
 from src.tiffExample import writeTiff # Import function to write GeoTIFF files
 from src.processLVIS import lvisGround #Importing lvisGround class from processLVIS
 from src.WriteExtent import extent
-from src.Commands import getCmdArgs
-#from Task2 import plotLVIS
+from src.Commands import getCmdArgs, norm_lon 
 from matplotlib import pyplot as plt #Import for plotting
 import numpy as np #Import for numerical operations 
 import os #Import for file and directory handling
 import rasterio #Import to help with Raster Data
 from glob import glob #Import to help with multiple files and folders 
-from pyproj import Proj, Transformer, transform
-
-
-#from Task2 import reprojectLVIS
+from pyproj import Transformer
 
 tracemalloc.start()
 
@@ -29,14 +25,15 @@ class plotLVIS(lvisGround):
 
 
   def writeDEM(self,res,outName):
-    '''Write LVIS ground elevation data to a geotiff'''
+    '''Write LVIS ground elevation data to a geotiff
+    
+    Paramters:
+      res (int): Resolution of the output raster
+      outname (str): Output file name
+    '''
     # call function from tiffExample.py
     writeTiff(self.zG,self.long,self.lat,res,filename=outName,epsg=3031)
     return
-    
-def norm_lon(lon):
-    """Fixes negetive CRS issues"""
-    return (lon) % 360 #Normalise longitude to ensure it stays within a valid range (0-360 degrees)
 
 
 ##########################################

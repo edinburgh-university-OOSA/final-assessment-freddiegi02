@@ -8,10 +8,9 @@ from src.tiffExample import writeTiff # Import function to write GeoTIFF files
 from src.processLVIS import lvisGround #Importing lvisGround class from processLVIS
 from matplotlib import pyplot as plt #Import for plotting
 import numpy as np #Import for numerical operations 
-from rasterio.merge import merge #Import for merging GeoTIFF files
 from glob import glob #Import to help with multiple files and folders
 import os #Import for file and directory handling
-from src.Commands import getCmdArgs
+from src.Commands import getCmdArgs, norm_lon
 
 
 
@@ -29,10 +28,6 @@ class plotLVIS(lvisGround):
     '''Write LVIS ground elevation data to a geotiff'''
     writeTiff(self.zG,self.long,self.lat,res,filename=outName,epsg=3031)
     return
-
-def norm_lon(lon):
-    """Fixes negetive CRS issues"""
-    return (lon) % 360 #Normalise longitude to ensure it stays within a valid range (0-360 degrees)
 
 if __name__=="__main__":
   '''Main block'''
@@ -89,14 +84,11 @@ plt.savefig(f"Output_Images/PIG_Single_{year}.png", dpi=75, bbox_inches='tight')
 
 # Call Memory Function to get the currnet and peak memory in bytes
 current, peak = tracemalloc.get_traced_memory()
-
 # Convert bytes to GB
 current_mb = current / 10**9
 peak_mb = peak / 10**9
-
 # Print memory usage details
 print(f"Current memory usage: {current_mb:.2f} GB")
 print(f"Peak memory usage: {peak_mb:.2f} GB")
-
 # Stop tracing memory
 tracemalloc.stop()

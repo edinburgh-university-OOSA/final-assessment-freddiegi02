@@ -26,12 +26,8 @@ class lvisData(object):
 
   def __init__(self,filename,setElev=False,minX=-100000000,maxX=100000000,minY=-1000000000,maxY=100000000,onlyBounds=False):
     '''
-    Class initialiser. Calls a function
-    to read LVIS data within bounds
-    minX,minY and maxX,maxY
-    setElev=1 converts LVIS's stop and start
-    elevations to arrays of elevation.
-    onlyBounds sets "bounds" to the corner of the area of interest
+    Class initialiser. Calls a function to read LVIS data within bounds minX,minY and maxX,maxY etElev=1 converts LVIS's stop and start
+    elevations to arrays of elevation. OnlyBounds sets "bounds" to the corner of the area of interest
     '''
     # call the file reader and load in to the self
     self.readLVIS(filename,minX,minY,maxX,maxY,onlyBounds)
@@ -40,43 +36,21 @@ class lvisData(object):
 
 
 
-  ################
-
-  # def getCmdArgs(self):
-  #   '''
-  #   Get commandline arguments
-  #   '''
-  #   # Create an argparse paser object with a description
-  #   ap = argparse.ArgumentParser(description=("An illustration of a command line parser"))
-  #   # Add a positional argument for the input filename (string)
-  #   ap.add_argument("filename",type=str,help=("Input filename"))
-  #   # Add a positional argument for the resolution (integer)
-  #   ap.add_argument("res", type=int,help=("Spec Res"))
-  #   # Add a postioal argument to specify the year of the data
-  #   ap.add_argument('year', type=str,help=("2009 or 2015"))
-  #   ap.add_argument("waveform",type=int,help=("Input Number"))
-  #   # Parse command-line arguments
-  #   args = ap.parse_args()
-  #   # return that object from this function
-  #   return args
-
-
-
 ############################################################################
 
 
   def mergeDEM(self, year, dirpath, out_fp):
-    """A function to merge all of the tiles of the raster together """
+    """A function to merge all of the tiles of the raster together 
     
-    # # Get the current working directory (PWD)
-    # current_dir = os.getcwd()
+    Parameters: 
+      year (int): File year
+      dirpath (string): Input file location 
+      out_fp (string): Output file location
 
-    # #Use the current working directory for the input files and output file
-    # dirpath = glob(f"{current_dir}/LVIS{year}/Datasets/T3*tif")
-    # print(dirpath)
-    # out_fp = f"{current_dir}/LVIS{year}/GeoTIFF/T3_Merged{year}.tif"
 
-    # #Iniate an empty list
+    Returns:
+      merged file (geotiff)
+    """
     mosacic_files = []
 
     # Loop through files in the folder
@@ -111,13 +85,26 @@ class lvisData(object):
     plt.colorbar(label="Elevation(m)")  # Add a color bar for reference
 
 
+    folder_path = f'LVIS{year}/Datasets'
 
-
- #################################
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
 
 
   def interpolation(self, year, fit_file, out_interfile):
-    """Function to Gap fill the arugments """
+    """A function to merge all of the tiles of the raster together 
+    
+    Parameters: 
+      year (int): File year
+      fit_file (string): Input file location 
+      out_interfile (string): Output file location
+
+
+    Returns:
+      Interpolated file (geotiff)
+    """
 
     # Read the first band of the raster file
     raster = fit_file.read(1)
@@ -156,7 +143,15 @@ class lvisData(object):
   #############
 
   def reprojectLVIS(self, outEPSG):
-    '''A method to reproject the geolocation data'''
+    '''A method to reproject the geolocation data
+    
+    Parameters:
+
+    Outputs:
+      new CRS
+    
+    
+    '''
     inProj=Proj("epsg:4326")
     outProj=Proj("epsg:"+str(outEPSG))
     self.long, self.lat=transform(inProj, outProj,self.lat,self.lon)
@@ -258,4 +253,3 @@ class lvisData(object):
                                                                                   # rather than a tuple ()
 
 ###########################################
-

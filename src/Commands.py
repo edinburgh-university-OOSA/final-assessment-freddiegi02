@@ -20,3 +20,18 @@ def getCmdArgs():
     args = ap.parse_args()
     # return that object from this function
     return args
+
+
+def norm_lon(lon):
+    """
+    SFixes negetive CRS issues
+    
+    Paramters:
+      lon (float): Longitide Value
+
+    Returns:
+      float: Normalised longitude within the range of 0-360 degrees"
+      """
+    return (lon) % 360 #Normalise longitude to ensure it stays within a valid range (0-360 degrees)
+
+

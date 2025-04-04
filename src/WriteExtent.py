@@ -3,6 +3,15 @@ import numpy as np
 from rasterio.windows import from_bounds
 
 def extent(input_raster, output_raster, common_bounds):
+
+    """
+    Crops an input raster to a specified bounding box and writes the output to a new raster file.
+    
+    Parameters:
+        input_raster (str): Path to the input raster file.
+        output_raster (str): Path to save the output raster file.
+        common_bounds (tuple): Bounding box (min_x, min_y, max_x, max_y) for cropping.
+    """
     with rasterio.open(input_raster) as src:
         # Create a window based on the given common bounds
         window = from_bounds(*common_bounds, transform=src.transform)

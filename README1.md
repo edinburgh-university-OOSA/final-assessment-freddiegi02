@@ -4,10 +4,11 @@ The task was to develop a python script, capable of comparing elevation change b
 
 ## Geting Started
 
-These instructions will get you a copy of the project up and running on your local machine to run and test the code.
+These instructions will get you a copy of the project up and running on your laptop to run and test the code.
 
 ### Prerequisites
-All of the librairs used in this project are already installed in Edinburgh University Scotia environment. If you are using the libraies using the command:
+All of the libraries used in this project are already installed in Edinburgh University Scotia environment.
+If you do encounter any errors you can install them using the following commands.
 ```
 pip install <library_name>
 ```
@@ -43,8 +44,7 @@ The src directory contains the scripts were provided.
 The display.py script is used to display the data. 
 The README.md file contains the instructions for running the code.
 Task 1 - 5 are the scripts that were used to process the data and where the code sould be run from.
-The LVIS2009 and LVIS2015 directories contain the datasets and geotiffs for each year. 
-
+The LVIS2009 and LVIS2015 directories are where the scripts will export the datasets and Geotiff to.
 
 ### Running the code
 To run the code you will need to use a python command line parser for each task.
@@ -66,12 +66,10 @@ This will run the code in the Task2.py file and display the following output:
 ![Alt text](Output_Images/PIG_Single_2009.png)
 
 
-For Task 3, run the following command:def norm_lon(lon):
-    #Normalise longitude to ensure values remain within a valid range (0-360 degrees)
-    return (lon) % 360
+For Task 3, run the following command:
 
 ```
-python Task1.py /geos/netdata/oosa/assigment/lvis/2015 30 2015
+python Task3.py /geos/netdata/oosa/assigment/lvis/2015 30 2015
 ```
 This will run the code in the Task3.py file and display the following output:
 

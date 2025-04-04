@@ -13,7 +13,11 @@ class plotLVIS(lvisGround):
 
 
   def plotWave(self, i):
-    """Plots the wavefrom for the given index"""
+    """Plots the wavefrom for the given index
+    
+    Parameters:
+      i (int): Index of the waveform to the plotted
+    """
 
     # # Extract the waveform data
     wave_data = self.waves[i]
@@ -58,5 +62,4 @@ lvis=plotLVIS(filename,minX=x0,minY=y0,maxX=x1,maxY=y1,setElev=True)
 
 #Plot the choosen waveform
 lvis.plotWave(waveform)
-
 
