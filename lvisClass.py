@@ -9,12 +9,8 @@ import numpy as np
 import h5py
 from pyproj import Proj, transform #Importing Proj and transform to change the CRS
 import rasterio
-import glob
-import os
-from rasterio.merge import merge #Import for merging GeoTIFF files
 import matplotlib.pyplot as plt
 from rasterio.fill import fillnodata
-import argparse
 ###################################
 
 class lvisData(object):
@@ -39,58 +35,58 @@ class lvisData(object):
 ############################################################################
 
 
-  def mergeDEM(self, year, dirpath, out_fp):
-    """A function to merge all of the tiles of the raster together 
+  # def mergeDEM(self, year, dirpath, out_fp):
+  #   """A function to merge all of the tiles of the raster together 
     
-    Parameters: 
-      year (int): File year
-      dirpath (string): Input file location 
-      out_fp (string): Output file location
+  #   Parameters: 
+  #     year (int): File year
+  #     dirpath (string): Input file location 
+  #     out_fp (string): Output file location
 
 
-    Returns:
-      merged file (geotiff)
-    """
-    mosacic_files = []
+  #   Returns:
+  #     merged file (geotiff)
+  #   """
+  #   mosacic_files = []
 
-    # Loop through files in the folder
-    for files in dirpath:
-        src = rasterio.open(files) #Open the files
-        mosacic_files.append(src) #Append the files to the list 
+  #   # Loop through files in the folder
+  #   for files in dirpath:
+  #       src = rasterio.open(files) #Open the files
+  #       mosacic_files.append(src) #Append the files to the list 
 
-    # Merge the tiles to a mosaic
-    mosaic, out_trans = merge(mosacic_files)
-
-
-    # Copy the metadata
-    out_meta = src.meta.copy()
+  #   # Merge the tiles to a mosaic
+  #   mosaic, out_trans = merge(mosacic_files)
 
 
-    #Set the output parameters
-    out_meta.update({
-        "driver": "GTiff", #set file type
-        "height": mosaic.shape[1], # Set the height 
-        "width": mosaic.shape[2], # Define the width
-        "transform": out_trans, # Transform the mosaic
-        "count": mosaic.shape[0], #Set the number of layers and bands
-        "dtype": mosaic.dtype, #Set the datatype of the array
-    })
-
-    #Open a raster and read the files to it
-    with rasterio.open(out_fp, "w", **out_meta) as dest:
-        dest.write(mosaic)
-
-    plt.clf()
-    plt.imshow(mosaic[0], cmap='viridis')  # You can adjust the colormap as needed
-    plt.colorbar(label="Elevation(m)")  # Add a color bar for reference
+  #   # Copy the metadata
+  #   out_meta = src.meta.copy()
 
 
-    folder_path = f'LVIS{year}/Datasets'
+  #   #Set the output parameters
+  #   out_meta.update({
+  #       "driver": "GTiff", #set file type
+  #       "height": mosaic.shape[1], # Set the height 
+  #       "width": mosaic.shape[2], # Define the width
+  #       "transform": out_trans, # Transform the mosaic
+  #       "count": mosaic.shape[0], #Set the number of layers and bands
+  #       "dtype": mosaic.dtype, #Set the datatype of the array
+  #   })
 
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
-        if os.path.isfile(file_path):
-            os.remove(file_path)
+  #   #Open a raster and read the files to it
+  #   with rasterio.open(out_fp, "w", **out_meta) as dest:
+  #       dest.write(mosaic)
+
+  #   plt.clf()
+  #   plt.imshow(mosaic[0], cmap='viridis')  # You can adjust the colormap as needed
+  #   plt.colorbar(label="Elevation(m)")  # Add a color bar for reference
+
+
+  #   folder_path = f'LVIS{year}/Datasets'
+
+  #   for filename in os.listdir(folder_path):
+  #       file_path = os.path.join(folder_path, filename)
+  #       if os.path.isfile(file_path):
+  #           os.remove(file_path)
 
 
   def interpolation(self, year, fit_file, out_interfile):
@@ -253,3 +249,4 @@ class lvisData(object):
                                                                                   # rather than a tuple ()
 
 ###########################################
+

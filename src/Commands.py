@@ -1,5 +1,9 @@
   
 import argparse
+import rasterio
+from rasterio.merge import merge #Import for merging GeoTIFF files
+import matplotlib.pyplot as plt
+import os
 
 
 def getCmdArgs():
@@ -33,5 +37,58 @@ def norm_lon(lon):
       float: Normalised longitude within the range of 0-360 degrees"
       """
     return (lon) % 360 #Normalise longitude to ensure it stays within a valid range (0-360 degrees)
+
+def mergeDEM( year, dirpath, out_fp):
+    """A function to merge all of the tiles of the raster together 
+    
+    Parameters: 
+      year (int): File year
+      dirpath (string): Input file location 
+      out_fp (string): Output file location
+
+
+    Returns:
+      merged file (geotiff)
+    """
+    mosacic_files = []
+
+    # Loop through files in the folder
+    for files in dirpath:
+        src = rasterio.open(files) #Open the files
+        mosacic_files.append(src) #Append the files to the list 
+
+    # Merge the tiles to a mosaic
+    mosaic, out_trans = merge(mosacic_files)
+
+
+    # Copy the metadata
+    out_meta = src.meta.copy()
+
+
+    #Set the output parameters
+    out_meta.update({
+        "driver": "GTiff", #set file type
+        "height": mosaic.shape[1], # Set the height 
+        "width": mosaic.shape[2], # Define the width
+        "transform": out_trans, # Transform the mosaic
+        "count": mosaic.shape[0], #Set the number of layers and bands
+        "dtype": mosaic.dtype, #Set the datatype of the array
+    })
+
+    #Open a raster and read the files to it
+    with rasterio.open(out_fp, "w", **out_meta) as dest:
+        dest.write(mosaic)
+
+    plt.clf()
+    plt.imshow(mosaic[0], cmap='viridis')  # You can adjust the colormap as needed
+    plt.colorbar(label="Elevation(m)")  # Add a color bar for reference
+
+
+    folder_path = f'LVIS{year}/Datasets'
+
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
 
 

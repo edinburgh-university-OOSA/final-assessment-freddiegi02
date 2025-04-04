@@ -28,6 +28,7 @@ class plotLVIS(lvisGround):
     '''Write LVIS ground elevation data to a geotiff'''
     writeTiff(self.zG,self.long,self.lat,res,filename=outName,epsg=3031)
     return
+  
 
 if __name__=="__main__":
   '''Main block'''
