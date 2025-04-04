@@ -51,7 +51,7 @@ To run the code you will need to use a python command line parser for each task.
 
 For Task 1, run the following command:
 ```
-python Task1.py /geos/netdata/oosa/assignment/lvis/2015/ILVIS1B_AQ2015_1012_R1605_070498.h5 30 
+python Task1.py --filename /geos/netdata/oosa/assignment/lvis/2015/ILVIS1B_AQ2015_1012_R1605_070498.h5 --waveform 30 
 ```
 This will run the code in the Task1.py file and display the following output:
 
@@ -59,7 +59,7 @@ This will run the code in the Task1.py file and display the following output:
 
 For Task 2, run the following command:
 ```
-python Task2.py 
+python Task2.py --filename  /geos/netdata/oosa/assignment/lvis/2009/ILVIS1B_AQ2009_1020_R1408_061398.h5 --res 30 --year 2009
 ```
 This will run the code in the Task2.py file and display the following output: 
 

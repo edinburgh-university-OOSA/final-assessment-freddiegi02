@@ -1,27 +1,11 @@
 
 from src.processLVIS import lvisGround #Importing lvisGround class from processLVIS
 from matplotlib import pyplot as plt #Import for plotting
-import numpy as np #Import for numerical operations 
-import argparse #Import for handling command-line arguments
+from src.Commands import getCmdArgs
 
 
 ##########################################
 
-def getCmdArgs():
-  # function description for use within python
-  '''
-  Get commandline arguments
-  '''
-  # Create an argparse object with a description
-  ap = argparse.ArgumentParser(description=("An illustration of a command line parser"))
-  # Add a positional argument for the input filename (string)
-  ap.add_argument("filename",type=str,help=("Input filename"))
-  # Add a positional argument for the waveform index (integer)
-  ap.add_argument("waveform",type=int,help=("Input Number"))
-  # Parse the command-line arguments
-  args = ap.parse_args()
-  # return that object from this function
-  return args
 
 class plotLVIS(lvisGround):
   '''A class, ineriting from lvisData
