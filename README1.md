@@ -69,7 +69,7 @@ This will run the code in the Task2.py file and display the following output:
 For Task 3, run the following command:
 
 ```
-python Task3.py /geos/netdata/oosa/assigment/lvis/2015 30 2015
+python Task3.py --folder /geos/netdata/oosa/assignment/lvis/2015 --res 30 --year 2015
 ```
 This will run the code in the Task3.py file and display the following output:
 

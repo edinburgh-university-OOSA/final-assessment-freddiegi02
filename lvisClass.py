@@ -8,9 +8,6 @@ with methods to read
 import numpy as np
 import h5py
 from pyproj import Proj, transform #Importing Proj and transform to change the CRS
-import rasterio
-import matplotlib.pyplot as plt
-from rasterio.fill import fillnodata
 ###################################
 
 class lvisData(object):
@@ -89,52 +86,52 @@ class lvisData(object):
   #           os.remove(file_path)
 
 
-  def interpolation(self, year, fit_file, out_interfile):
-    """A function to merge all of the tiles of the raster together 
+  # def interpolation(self, year, fit_file, out_interfile):
+  #   """A function to merge all of the tiles of the raster together 
     
-    Parameters: 
-      year (int): File year
-      fit_file (string): Input file location 
-      out_interfile (string): Output file location
+  #   Parameters: 
+  #     year (int): File year
+  #     fit_file (string): Input file location 
+  #     out_interfile (string): Output file location
 
 
-    Returns:
-      Interpolated file (geotiff)
-    """
+  #   Returns:
+  #     Interpolated file (geotiff)
+  #   """
 
-    # Read the first band of the raster file
-    raster = fit_file.read(1)
+  #   # Read the first band of the raster file
+  #   raster = fit_file.read(1)
 
-    # Create a boolean mask where raster values are not equal to -999 (considered as no-data)
-    mask_boolean = (raster !=-999)
+  #   # Create a boolean mask where raster values are not equal to -999 (considered as no-data)
+  #   mask_boolean = (raster !=-999)
 
-    # Use fillnodata function to fill missing data in the raster
-    # Nax Search Distance defines the window size for the fill algorithm
-    filled_raster = fillnodata(raster, mask = mask_boolean, max_search_distance = 250)
+  #   # Use fillnodata function to fill missing data in the raster
+  #   # Nax Search Distance defines the window size for the fill algorithm
+  #   filled_raster = fillnodata(raster, mask = mask_boolean, max_search_distance = 250)
 
 
-    #Copy the output metadata
-    out_meta = fit_file.meta.copy()
-    out_meta.update({
-        "driver": "GTiff", #Set the driver
-        "height": filled_raster.shape[0], #Set the height
-        "width": filled_raster.shape[1], #Set the width
-        "transform": fit_file.transform, #Transform the CRS
-        "dtype": filled_raster.dtype, # Set the data type of the array
-    })
+  #   #Copy the output metadata
+  #   out_meta = fit_file.meta.copy()
+  #   out_meta.update({
+  #       "driver": "GTiff", #Set the driver
+  #       "height": filled_raster.shape[0], #Set the height
+  #       "width": filled_raster.shape[1], #Set the width
+  #       "transform": fit_file.transform, #Transform the CRS
+  #       "dtype": filled_raster.dtype, # Set the data type of the array
+  #   })
 
-    #Open the file using rasterio and write hte file name to it 
-    with rasterio.open(out_interfile, "w", **out_meta) as dest:
-        dest.write(filled_raster, 1)
+  #   #Open the file using rasterio and write hte file name to it 
+  #   with rasterio.open(out_interfile, "w", **out_meta) as dest:
+  #       dest.write(filled_raster, 1)
 
-        # Plot the filled raster
-    plt.clf()
-    plt.imshow(filled_raster, cmap='viridis')  # You can adjust the colormap as needed
-    plt.colorbar(label="Elevation (m)")  # Add a color bar for reference
-    plt.title(f"PIG Elevation for Year {year}")
+  #       # Plot the filled raster
+  #   plt.clf()
+  #   plt.imshow(filled_raster, cmap='viridis')  # You can adjust the colormap as needed
+  #   plt.colorbar(label="Elevation (m)")  # Add a color bar for reference
+  #   plt.title(f"PIG Elevation for Year {year}")
 
-    # Save the figure as a PNG with the specified DPI and tight bounding box
-    plt.savefig(f"Output_Images/PIG{year}.png", dpi=75, bbox_inches='tight')
+  #   # Save the figure as a PNG with the specified DPI and tight bounding box
+  #   plt.savefig(f"Output_Images/PIG{year}.png", dpi=75, bbox_inches='tight')
 
   #############
 
