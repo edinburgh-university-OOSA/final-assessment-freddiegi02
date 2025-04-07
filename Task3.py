@@ -3,12 +3,12 @@ A script to run multiple scripts and join them together
 This script processes LVIS data, creates Digital Elevation Models (DEMs) 
 and merges them into one output file.
 '''
-import tracemalloc
+import tracemalloc #Import for memory tracking
 from src.tiffExample import writeTiff # Import function to write GeoTIFF files
 from src.processLVIS import lvisGround #Importing lvisGround class from processLVIS
-from src.WriteExtent import extent
+from src.WriteExtent import extent #Import the function of bouding box
 from src.Commands import getCmdArgs, norm_lon, mergeDEM, interpolation
-from Task2 import file_loop
+from Task2 import file_loop #Importing the function to loop through files
 from matplotlib import pyplot as plt #Import for plotting
 import numpy as np #Import for numerical operations 
 import os #Import for file and directory handling
@@ -16,7 +16,7 @@ import rasterio #Import to help with Raster Data
 from glob import glob #Import to help with multiple files and folders 
 from pyproj import Transformer
 
-tracemalloc.start()
+tracemalloc.start() # Start memory tracking
 
 ##########################################S
 
@@ -54,7 +54,6 @@ if __name__=="__main__":
   x1 = norm_lon(-99.0) #set max x coord
   y1 = -75.152 #set max y coord
 
-
   step_x = (x1 - x0) / 6 # Divide the x-range into 6 tiles
   step_y = (y1 - y0) / 6  # Divide the y-range into 6 tiles
   file_count = 1 #Initialise a counter
@@ -65,53 +64,38 @@ if __name__=="__main__":
 
       try: 
           print(f"File Processed {filepath}") #Print files being processed
-
-
           file_count = file_loop(filepath, x0, x1, y0, y1, step_x, step_y, res, year, file_count)
-
 
       except AttributeError as e:
           #Print error in file
           print(f"{filepath} Skipped")
 
   #Call the merge function
-  current_dir = os.getcwd()
-  dirpath = glob(f"{current_dir}/LVIS{year}/Datasets/T2*tif")
-  out_fp = f"{current_dir}/LVIS{year}/GeoTIFF/T2_Merged{year}.tif"
-  mergeDEM(year,dirpath, out_fp)
-  plt.title(f"PIG Elevation for the {year}")
-  # Save the figure as a PNG with the specified DPI and tight bounding box
-  plt.savefig(f"Output_Images/PIG_Site_{year}.png", dpi=75, bbox_inches='tight')
+  out_fp = f"LVIS{year}/GeoTIFF/T3_Merged{year}.tif"
+  mergeDEM(year, out_fp, x0, y0, x1, y1) 
 
+  #Transform the coordinates to EPSG:3031
   transformer = Transformer.from_crs("EPSG:4326", "EPSG:3031", always_xy=True)
-  min_x, min_y = transformer.transform(x0, y0)
-  max_x, max_y = transformer.transform(x1, y1)
-  bouding_box = (max_x, min_y, min_x, max_y)
+  min_x, min_y = transformer.transform(x0, y0)  # Transform minimum coordinates
+  max_x, max_y = transformer.transform(x1, y1)  # Transform maximum coordinates
+  bounding_box = (max_x, min_y, min_x, max_y)  # Define the bounding box
 
-  input_raster = f'LVIS{year}/GeoTIFF/T2_Merged{year}.tif'
-  output_raster = f'LVIS{year}/GeoTIFF/T2_Merged{year}_FIT.tif'
-  print(f"Input Raster: {input_raster}")
-  print(f"Output Raster: {output_raster}")
-  print(f"Common Bounds: {bouding_box}")
-  extent(input_raster, output_raster, bouding_box)
+  input_raster = f'LVIS{year}/GeoTIFF/T3_Merged{year}.tif'
+  output_raster = f'LVIS{year}/GeoTIFF/T3_Merged{year}_FIT.tif'
+  extent(input_raster, output_raster, bounding_box)
 
 
   # Open the GeoTIFF file for the specfied year 
-  fit_file = rasterio.open(f'LVIS{year}/GeoTIFF/T2_Merged{year}_FIT.tif')
+  fit_file = rasterio.open(f'LVIS{year}/GeoTIFF/T3_Merged{year}_FIT.tif')
   #Define the output file path for the filled raster
-  out_interfile = f'LVIS{year}/GeoTIFF/T2_Merged{year}_FILL.tif'
-  interpolation(year, fit_file, out_interfile)
+  out_interfile = f'LVIS{year}/GeoTIFF/T3_Merged{year}_FILL.tif'
+  interpolation(year, fit_file, out_interfile, x0, y0, x1, y1)
       
 
   peak = tracemalloc.get_traced_memory()
-
   # Convert bytes to MB for better readability
   peak_mb = peak[0] / 10**9  # Peak memory in GB
-  current_mb = peak[1] / 10**9  # Current memory in GB
-
   # Print memory usage details
   print(f"Peak memory usage: {peak_mb:.2f} GB")
-  print(f"Current memory usage: {current_mb:.2f} GB")
-
   # Stop tracing memory
   tracemalloc.stop()

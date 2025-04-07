@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt #Import for plotting
 import numpy as np #Import for numerical operations 
 from glob import glob #Import to help with multiple files and folders
 import os #Import for file and directory handling
-from src.Commands import getCmdArgs, norm_lon, mergeDEM
+from src.Commands import getCmdArgs, norm_lon, mergeDEM #Importing the command line arguments and new functions
 
 
 
@@ -30,9 +30,28 @@ class plotLVIS(lvisGround):
     return
   
 def file_loop(filename, x0, x1, y0, y1, step_x, step_y, res, year, file_count):
-  for tile_x0 in np.arange(x0,x1, step_x):
+  """Function to loop through the files within a folder and creates DEEM files
+  Parameters:
+      filename (str): Path to the LVIS file.
+      x0 (float): Minimum x-coordinate.
+      x1 (float): Maximum x-coordinate.
+      y0 (float): Minimum y-coordinate.
+      y1 (float): Maximum y-coordinate.
+      step_x (float): Step size in the x-direction.
+      step_y (float): Step size in the y-direction.
+      res (float): Resolution for the DEM files.
+      year (int): Year for naming the output files.
+      file_count (int): Counter for naming output files.
+      
+      
+    Returns:
+      file_count (int): Updated file count
+      DEM (getTiff): DEM of site
+    """
+  
+  for tile_x0 in np.arange(x0,x1, step_x): # Loop through the x-coordinates
     tile_x1=tile_x0+step_x
-    for tile_y0 in np.arange(y0, y1, step_y):
+    for tile_y0 in np.arange(y0, y1, step_y):  #
       tile_y1=tile_y0+step_y
       
       try:
@@ -42,7 +61,7 @@ def file_loop(filename, x0, x1, y0, y1, step_x, step_y, res, year, file_count):
 
         lvis.reprojectLVIS(3031) # Reproject the data to the Antarctic Polar Stereographic projection (EPSG 3031)
         lvis.estimateGround() #Call the estimate ground function
-        outName = f"LVIS{year}/Datasets/T2_DEM_{file_count}.tif"  # Estimate ground elevation from LVIS data
+        outName = f"LVIS{year}/Datasets/DEM_{file_count}.tif"  # Estimate ground elevation from LVIS data
         lvis.writeDEM(res, outName) # Write the DEM data to a GeoTIFF file with the specified resolution
         file_count +=1 #Increase the file size by one each time
       
@@ -73,16 +92,9 @@ if __name__=="__main__":
   file_loop(filename, x0, x1, y0, y1, step_x, step_y, res, year, file_count)
   # Call the merge fuction
   # Use the current working directory for the input files and output file
-  current_dir = os.getcwd()
-  dirpath = glob(f"LVIS{year}/Datasets/T2*tif")
   #Outpaths for all of the Merged files
-  out_fp = f"LVIS{year}/GeoTIFF/T2_Merged{year}.tif"
-  mergeDEM(year, dirpath, out_fp) 
-  plt.title(f"PIG Elevation for the {year}")
-  # Save the figure as a PNG with the specified DPI and tight bounding box
-  plt.savefig(f"Output_Images/PIG_Single_{year}.png", dpi=75, bbox_inches='tight')
-
-
+  out_fp = f"LVIS{year}/GeoTIFF/T2_merged{year}.tif"
+  mergeDEM(year, out_fp, x0, y0, x1, y1) 
 
 
   # Call Memory Function to get the currnet and peak memory in bytes

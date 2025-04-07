@@ -5,6 +5,7 @@ from rasterio.merge import merge #Import for merging GeoTIFF files
 import matplotlib.pyplot as plt
 import os
 from rasterio.fill import fillnodata
+from glob import glob
 
 
 def getCmdArgs():
@@ -39,7 +40,7 @@ def norm_lon(lon):
       """
     return (lon) % 360 #Normalise longitude to ensure it stays within a valid range (0-360 degrees)
 
-def mergeDEM( year, dirpath, out_fp):
+def mergeDEM( year, out_fp, x0, y0, x1, y1):
     """A function to merge all of the tiles of the raster together 
     
     Parameters: 
@@ -51,6 +52,7 @@ def mergeDEM( year, dirpath, out_fp):
     Returns:
       merged file (geotiff)
     """
+    dirpath = glob(f"LVIS{year}/Datasets/*.tif")
     mosacic_files = []
 
     # Loop through files in the folder
@@ -80,9 +82,15 @@ def mergeDEM( year, dirpath, out_fp):
     with rasterio.open(out_fp, "w", **out_meta) as dest:
         dest.write(mosaic)
 
+    
+
     plt.clf()
     plt.imshow(mosaic[0], cmap='viridis')  # You can adjust the colormap as needed
     plt.colorbar(label="Elevation(m)")  # Add a color bar for reference
+    plt.title(f"PIG Elevation for the {year}")
+    # Save the figure as a PNG with the specified DPI and tight bounding box
+    plt.savefig(f"Output_Images/PIG_{year}_{x0:.2f}_{x1:.2f}_{y0:.2f}_{y1:.2f}.png", dpi=75, bbox_inches='tight')
+
 
 
     folder_path = f'LVIS{year}/Datasets'
@@ -93,7 +101,7 @@ def mergeDEM( year, dirpath, out_fp):
             os.remove(file_path)
 
 
-def interpolation( year, fit_file, out_interfile):
+def interpolation( year, fit_file, out_interfile, x0, y0, x1, y1):
   """A function to merge all of the tiles of the raster together 
   
   Parameters: 
@@ -138,4 +146,4 @@ def interpolation( year, fit_file, out_interfile):
   plt.title(f"PIG Elevation for Year {year}")
 
   # Save the figure as a PNG with the specified DPI and tight bounding box
-  plt.savefig(f"Output_Images/PIG{year}.png", dpi=75, bbox_inches='tight')
+  plt.savefig(f"Output_Images/PIG_Elevation_{year}_{x0:.2f}_{x1:.2f}_{y0:.2f}_{y1:.2f}.png", dpi=75, bbox_inches='tight')

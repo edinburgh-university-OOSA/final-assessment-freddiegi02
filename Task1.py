@@ -1,7 +1,7 @@
 
 from src.processLVIS import lvisGround #Importing lvisGround class from processLVIS
 from matplotlib import pyplot as plt #Import for plotting
-from src.Commands import getCmdArgs
+from src.Commands import getCmdArgs #Importing the command line arguments
 
 
 ##########################################
@@ -35,7 +35,7 @@ class plotLVIS(lvisGround):
     plt.xlabel("Waveform return") # X-axis label
     plt.ylabel("Elevation (m)") # Y-axis label
     plt.savefig("Output_Images/Waveform.png", dpi=75, bbox_inches='tight')
-    plt.show() #Dispaly the plot
+    plt.show() #Display the plot
 
 
 ##########################################

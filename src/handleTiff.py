@@ -45,8 +45,3 @@ class TiffHandle:
         dst_ds = None  # Close file
         print(f"Image written to {filename}")
 
-
-# Min X: -1602026.6020989993
-# Max X: -1587559.2355732368
-# Min Y: -287230.75200707925
-# Max Y: -252337.0128109111

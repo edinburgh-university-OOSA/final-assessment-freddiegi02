@@ -51,4 +51,4 @@ def calculate_ice_loss(LVIS2009, LVIS2015, output_image="Output_Images/Elevation
     plt.show() #Show the figure
 
 if __name__ == '__main__':
-    calculate_ice_loss("LVIS2009/GeoTIFF/T2_Merged2009_FILL.tif", "LVIS2015/GeoTIFF/T2_Merged2015_FILL.tif")
+    calculate_ice_loss("LVIS2009/GeoTIFF/T3_Merged2009_FILL.tif", "LVIS2015/GeoTIFF/T3_Merged2015_FILL.tif")
