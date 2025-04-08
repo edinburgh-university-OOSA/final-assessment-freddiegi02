@@ -122,7 +122,7 @@ def interpolation( year, fit_file, out_interfile, x0, y0, x1, y1):
 
   # Use fillnodata function to fill missing data in the raster
   # Nax Search Distance defines the window size for the fill algorithm
-  filled_raster = fillnodata(raster, mask = mask_boolean, max_search_distance = 250)
+  filled_raster = fillnodata(raster, mask = mask_boolean, max_search_distance =1000)
 
 
   #Copy the output metadata

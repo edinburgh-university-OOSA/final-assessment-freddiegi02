@@ -82,7 +82,7 @@ if __name__=="__main__":
 
   input_raster = f'LVIS{year}/GeoTIFF/T3_Merged{year}.tif'
   output_raster = f'LVIS{year}/GeoTIFF/T3_Merged{year}_FIT.tif'
-  extent(input_raster, output_raster, bounding_box)
+  extent(input_raster, output_raster, bounding_box) #call the function to standarise the shape of the raster
 
 
   # Open the GeoTIFF file for the specfied year 
@@ -92,10 +92,13 @@ if __name__=="__main__":
   interpolation(year, fit_file, out_interfile, x0, y0, x1, y1)
       
 
-  peak = tracemalloc.get_traced_memory()
-  # Convert bytes to MB for better readability
-  peak_mb = peak[0] / 10**9  # Peak memory in GB
+   # Call Memory Function to get the currnet and peak memory in bytes
+  current, peak = tracemalloc.get_traced_memory()
+  # Convert bytes to GB
+  current_mb = current / 10**9
+  peak_mb = peak / 10**9
   # Print memory usage details
+  print(f"Current memory usage: {current_mb:.2f} GB")
   print(f"Peak memory usage: {peak_mb:.2f} GB")
   # Stop tracing memory
   tracemalloc.stop()

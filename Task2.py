@@ -51,7 +51,7 @@ def file_loop(filename, x0, x1, y0, y1, step_x, step_y, res, year, file_count):
   
   for tile_x0 in np.arange(x0,x1, step_x): # Loop through the x-coordinates
     tile_x1=tile_x0+step_x
-    for tile_y0 in np.arange(y0, y1, step_y):  #
+    for tile_y0 in np.arange(y0, y1, step_y):  #Loop through the y-coordiantes
       tile_y1=tile_y0+step_y
       
       try:
