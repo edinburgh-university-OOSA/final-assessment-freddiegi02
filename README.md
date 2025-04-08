@@ -44,10 +44,10 @@ The src directory contains the scripts were provided.
 The display.py script is used to display the data. 
 The README.md file contains the instructions for running the code.
 Task 1 - 5 are the scripts that were used to process the data and where the code sould be run from.
-The LVIS2009 and LVIS2015 directories are where the scripts will export the datasets and Geotiff to.
+The LVIS2009 and LVIS2015 directories are where the scripts will export the datasets and GeoTIF to.
 
 ### Running the code
-To run the code you will need to use a python command line parser for each task. Note: the filename extension and any of the other arguments below can be changed to suit your preference
+To run the code you will need to use a python command line parser for each task. Note: the filename extension and any of the other arguments below can be changed to suit your preference.
 
 **For Task 1, run the following command:**
 ```
@@ -57,7 +57,7 @@ This will run the code in the Task1.py file and display the following output:
 
 ![Alt text](Output_Images/Waveform.png)
 
-A single waveform which shows the intensity of the laser pulse over time. The x-axis is the time in nanoseconds and the y-axis is the height from the sensor
+A single waveform which shows the intensity of the laser pulse over time. The x-axis is time in nanoseconds and the y-axis is the height from the sensor
 
 **For Task 2, run the following command:**
 ```
@@ -79,7 +79,7 @@ This will run the code in the Task3.py file and display the following output:
 
 ![Alt text](Output_Images/PIG_Elevation_2009_259.80_261.00_-75.23_-75.15.png) ![Alt text](Output_Images/PIG_Elevation_2015_259.80_261.00_-75.23_-75.15.png)
 
-The whole of a small study site of the PIG in 2009 and 2015, showing the elevation of the glacier with interpoaltion between the missing data points
+The small study site of the PIG in 2009 and 2015, showing the elevation of the glacier with interpoaltion between the missing data points
 
 **For Task 5, run the following command:**
 ```
