@@ -14,11 +14,8 @@ pip install <library_name>
 ```
 
 ### Installing
-To install the project, you need to clone the repository using the command:
-```
-git clone git@github.com:edinburgh-university-OOSA/final-assessment-freddiegi02.git
-```
-Then, navigate to the final-assessment-freddiegi02 directory using the cd command
+To install the project, you need download the zip file.
+Then, navigate to the B270161 directory using the cd command
 
 ## Layout of the project
 ```
