@@ -47,7 +47,7 @@ Task 1 - 5 are the scripts that were used to process the data and where the code
 The LVIS2009 and LVIS2015 directories are where the scripts will export the datasets and Geotiff to.
 
 ### Running the code
-To run the code you will need to use a python command line parser for each task.
+To run the code you will need to use a python command line parser for each task. Note: the filename extension and any of the other arguments below can be changed to suit your preference
 
 **For Task 1, run the following command:**
 ```
