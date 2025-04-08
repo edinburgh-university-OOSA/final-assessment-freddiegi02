@@ -1,10 +1,10 @@
 # Mapping the Pine Island Galcier
 
-The task was to develop a python script, capable of comparing elevation change between two datasets. In this case using LiDAR Data to map data from LVIS (Land, Vegetation and Ice Sensor) 2009 and 2015. 
+The task was to develop a python script, capable of comparing elevation change between two datasets. In this case using LiDAR Data to map data from LVIS (Land, Vegetation and Ice Sensor) between 2009 and 2015. 
 
 ## Geting Started
 
-These instructions will get you a copy of the project up and running on your personal device to run and test the code.
+These instructions will get you a copy of the project on your personal device to run and test the code.
 
 ### Prerequisites
 All of the libraries used in this project are already installed in Edinburgh University Scotia environment.
